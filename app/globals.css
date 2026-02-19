@@ -1,0 +1,452 @@
+/* app/globals.css */
+@import "tailwindcss";
+
+/* ===== SEMANTIC FOUNDATION LAYER ===== */
+
+/* 🏥 Medical Teal Theme (Default) - DARK MODE DEFAULT */
+@theme {
+  /* ===== RAW THEME COLORS (OKLCH) ===== */
+  /* Core Background Colors - Pure Gray-Black for Dark Mode */
+  --color-background: oklch(0.15 0 0); /* Pure dark background */
+  --color-foreground: oklch(0.95 0 0); /* Pure white text */
+  --color-card: oklch(0.18 0 0); /* Pure gray card background */
+  --color-card-foreground: oklch(0.95 0 0); /* Pure white card text */
+  --color-popover: oklch(0.18 0 0); /* Pure gray popover background */
+  --color-popover-foreground: oklch(0.95 0 0); /* Pure white popover text */
+
+  /* Brand Colors - Medical Teal Spectrum (only for interactive elements) */
+  --color-primary: oklch(0.65 0.15 200); /* Vibrant medical teal */
+  --color-primary-foreground: oklch(0.98 0 0); /* Pure white on primary */
+  --color-secondary: oklch(0.25 0 0); /* Pure dark gray */
+  --color-secondary-foreground: oklch(0.95 0 0); /* Pure white text */
+
+  /* UI State Colors - Pure Gray */
+  --color-muted: oklch(0.25 0 0); /* Pure gray muted background */
+  --color-muted-foreground: oklch(0.65 0 0); /* Mid-tone gray text */
+  --color-accent: oklch(0.28 0 0); /* Pure gray accent background */
+  --color-accent-foreground: oklch(0.95 0 0); /* Pure white accent text */
+
+  /* System Colors */
+  --color-destructive: oklch(0.55 0.22 25); /* Modern red */
+  --color-destructive-foreground: oklch(0.98 0 0); /* Pure white on red */
+  --color-border: oklch(0.30 0 0); /* Pure gray borders */
+  --color-input: oklch(0.25 0 0); /* Pure gray input backgrounds */
+  --color-ring: oklch(0.65 0.15 200); /* Teal focus rings */
+
+  /* ===== TIER 2: GLOBAL SEMANTIC TOKENS ===== */
+
+  /* Brand Identity Colors */
+  --color-brand-primary: var(--color-primary);
+  --color-brand-secondary: oklch(0.7 0.15 190);
+  --color-brand-tertiary: oklch(0.6 0.12 210);
+
+  /* ===== TIER 3: CONTEXTUAL SEMANTIC TOKENS ===== */
+
+  /* Content (Text) Colors - Pure Gray Scale */
+  --color-content-primary: oklch(0.92 0 0); /* Bright white */
+  --color-content-secondary: oklch(0.65 0 0); /* Mid gray */
+  --color-content-tertiary: oklch(0.55 0 0); /* Darker gray */
+  --color-content-inverse: oklch(0.15 0 0); /* Dark text on light */
+  --color-content-disabled: oklch(0.45 0 0); /* Disabled text */
+
+  /* Surface (Background) Colors - Pure Gray Scale */
+  --color-surface-primary: var(--color-background); /* Main app background */
+  --color-surface-secondary: var(--color-card); /* Card/panel backgrounds */
+  --color-surface-tertiary: oklch(0.22 0 0); /* Elevated surfaces */
+  --color-surface-interactive: oklch(0.28 0 0); /* Hover backgrounds */
+  --color-surface-overlay: oklch(0.18 0 0 / 0.95); /* Modal overlays */
+
+  /* Interactive Element Colors */
+  --color-interactive-primary: var(--color-brand-primary); /* Primary buttons */
+  --color-interactive-primary-hover: oklch(0.7 0.15 200); /* Primary hover */
+  --color-interactive-secondary: var(--color-secondary); /* Secondary buttons */
+  --color-interactive-secondary-hover: oklch(0.30 0 0); /* Secondary hover */
+  --color-interactive-disabled: oklch(0.35 0 0); /* Disabled buttons */
+
+  /* Border Colors - Pure Gray Scale */
+  --color-border-primary: oklch(0.32 0 0); /* More visible borders */
+  --color-border-secondary: oklch(0.38 0 0); /* Subtle borders */
+  --color-border-interactive: var(--color-brand-primary); /* Focus/hover borders */
+  --color-border-glass: oklch(0.65 0.15 200 / 0.2); /* Glass morphism borders */
+  --color-border-subtle: oklch(0.35 0 0); /* Very subtle borders */
+
+  /* ===== SEMANTIC SPACING TOKENS ===== */
+  --spacing-compact: 0.5rem;
+  --spacing-comfortable: 1rem;
+  --spacing-spacious: 1.5rem;
+  --spacing-generous: 2rem;
+
+  /* ===== SEMANTIC BORDER RADIUS TOKENS ===== */
+  --radius-small-semantic: 0.375rem;
+  --radius-medium-semantic: 0.5rem;
+  --radius-large-semantic: 0.75rem;
+  --radius-extra-large-semantic: 1rem;
+
+  /* ===== SEMANTIC SHADOWS WITH BRAND GLOW ===== */
+  --shadow-elevation-1: 0 2px 8px oklch(0.1 0 0 / 0.3);
+  --shadow-elevation-2: 0 4px 16px oklch(0.1 0 0 / 0.4);
+  --shadow-elevation-3: 0 8px 24px oklch(0.1 0 0 / 0.5);
+  --shadow-elevation-4: 0 16px 40px oklch(0.1 0 0 / 0.6);
+  --shadow-glow-semantic: 0 0 50px oklch(0.65 0.15 200 / 0.15);
+  --shadow-glow-strong-semantic: 0 0 80px oklch(0.65 0.15 200 / 0.25);
+
+  /* ===== SEMANTIC GLASS MORPHISM ===== */
+  --glass-bg-semantic: oklch(0.18 0 0 / 0.8);
+  --glass-bg-strong-semantic: oklch(0.18 0 0 / 0.95);
+  --glass-border-semantic: var(--color-border-glass);
+  --glass-border-subtle-semantic: oklch(0.92 0 0 / 0.08);
+
+  /* ===== SEMANTIC GRADIENTS ===== */
+  --gradient-brand-semantic: linear-gradient(
+    135deg,
+    var(--color-brand-primary),
+    var(--color-brand-secondary)
+  );
+
+  /* ===== BACKDROP EFFECTS ===== */
+  --backdrop-blur-glass: 20px;
+  --backdrop-blur-strong: 30px;
+
+  /* ===== ALERT SEMANTIC COLORS (DARK MODE DEFAULT) ===== */
+  /* Success Alert Colors - Pure Gray-Black Base */
+  --color-alert-success-bg: oklch(0.20 0.04 158);
+  --color-alert-success-border: oklch(0.52 0.15 158 / 0.4);
+  --color-alert-success-text: oklch(0.85 0.05 158);
+  --color-alert-success-icon: oklch(0.65 0.15 158);
+
+  --color-alert-warning-bg: oklch(0.20 0.05 85);
+  --color-alert-warning-border: oklch(0.65 0.18 85 / 0.4);
+  --color-alert-warning-text: oklch(0.85 0.06 85);
+  --color-alert-warning-icon: oklch(0.65 0.18 85);
+
+  --color-alert-error-bg: oklch(0.18 0.06 25);
+  --color-alert-error-border: oklch(0.6 0.22 25 / 0.4);
+  --color-alert-error-text: oklch(0.85 0.05 25);
+  --color-alert-error-icon: oklch(0.65 0.22 25);
+
+  --color-alert-info-bg: oklch(0.18 0.05 250);
+  --color-alert-info-border: oklch(0.6 0.18 250 / 0.4);
+  --color-alert-info-text: oklch(0.85 0.05 250);
+  --color-alert-info-icon: oklch(0.65 0.18 250);
+}
+
+/* ===== THEME VARIANTS - SEMANTIC OVERRIDES ===== */
+
+/* 🔵 Clinical Blue Theme */
+[data-theme*="clinical"] {
+  --color-primary: oklch(0.6 0.18 250);
+  --color-brand-primary: oklch(0.6 0.18 250);
+  --color-brand-secondary: oklch(0.55 0.2 240);
+  --color-brand-tertiary: oklch(0.5 0.15 260);
+  --color-ring: oklch(0.6 0.18 250);
+  --color-border-glass: oklch(0.6 0.18 250 / 0.2);
+  --shadow-glow-semantic: 0 0 50px oklch(0.6 0.18 250 / 0.15);
+  --shadow-glow-strong-semantic: 0 0 80px oklch(0.6 0.18 250 / 0.25);
+  --gradient-brand-semantic: linear-gradient(
+    135deg,
+    oklch(0.6 0.18 250),
+    oklch(0.55 0.2 240)
+  );
+  --color-interactive-primary: oklch(0.6 0.18 250);
+  --color-interactive-primary-hover: oklch(0.65 0.18 250);
+}
+
+/* 🟢 Wellness Green Theme */
+[data-theme*="wellness"] {
+  --color-primary: oklch(0.6 0.15 158);
+  --color-brand-primary: oklch(0.6 0.15 158);
+  --color-brand-secondary: oklch(0.5 0.18 165);
+  --color-brand-tertiary: oklch(0.55 0.16 150);
+  --color-ring: oklch(0.6 0.15 158);
+  --color-border-glass: oklch(0.6 0.15 158 / 0.2);
+  --shadow-glow-semantic: 0 0 50px oklch(0.6 0.15 158 / 0.15);
+  --shadow-glow-strong-semantic: 0 0 80px oklch(0.6 0.15 158 / 0.25);
+  --gradient-brand-semantic: linear-gradient(
+    135deg,
+    oklch(0.6 0.15 158),
+    oklch(0.5 0.18 165)
+  );
+  --color-interactive-primary: oklch(0.6 0.15 158);
+  --color-interactive-primary-hover: oklch(0.65 0.15 158);
+}
+
+/* 🟣 Research Purple Theme */
+[data-theme*="research"] {
+  --color-primary: oklch(0.65 0.2 300);
+  --color-brand-primary: oklch(0.65 0.2 300);
+  --color-brand-secondary: oklch(0.7 0.18 290);
+  --color-brand-tertiary: oklch(0.6 0.22 310);
+  --color-ring: oklch(0.65 0.2 300);
+  --color-border-glass: oklch(0.65 0.2 300 / 0.2);
+  --shadow-glow-semantic: 0 0 50px oklch(0.65 0.2 300 / 0.15);
+  --shadow-glow-strong-semantic: 0 0 80px oklch(0.65 0.2 300 / 0.25);
+  --gradient-brand-semantic: linear-gradient(
+    135deg,
+    oklch(0.65 0.2 300),
+    oklch(0.7 0.18 290)
+  );
+  --color-interactive-primary: oklch(0.65 0.2 300);
+  --color-interactive-primary-hover: oklch(0.7 0.2 300);
+}
+
+/* ===== PROFESSIONAL LIGHT MODE VARIANTS ===== */
+[data-theme*="light"] {
+  /* WCAG AAA Compliant Professional Light Background System */
+  --color-background: oklch(1 0 0); /* Pure white */
+  --color-foreground: oklch(0.25 0.02 240); /* Professional dark blue-gray */
+  --color-card: oklch(1 0 0); /* Pure white cards */
+  --color-card-foreground: oklch(0.25 0.02 240); /* Professional text */
+  --color-popover: oklch(1 0 0); /* White popover */
+  --color-popover-foreground: oklch(0.25 0.02 240); /* Dark text */
+
+  /* Professional Secondary Colors */
+  --color-secondary: oklch(0.95 0.005 240); /* Very light blue-gray */
+  --color-secondary-foreground: oklch(0.25 0.02 240); /* Dark text */
+  --color-muted: oklch(0.96 0.005 240); /* Ultra light background */
+  --color-muted-foreground: oklch(0.5 0.01 240); /* Professional gray text */
+  --color-accent: oklch(0.97 0.005 240); /* Subtle accent background */
+  --color-accent-foreground: oklch(0.25 0.02 240); /* Dark text */
+
+  /* Professional Borders and Inputs */
+  --color-border: oklch(0.91 0.005 240); /* Clean gray borders */
+  --color-input: oklch(0.98 0.005 240); /* Very light input backgrounds */
+
+  /* Content Colors - WCAG AAA Compliant */
+  --color-content-primary: oklch(0.25 0.02 240); /* 7:1 contrast ratio */
+  --color-content-secondary: oklch(0.5 0.01 240); /* 4.6:1 contrast ratio */
+  --color-content-tertiary: oklch(0.58 0.01 240); /* 4.5:1 contrast ratio */
+  --color-content-inverse: oklch(1 0 0); /* White text on dark */
+  --color-content-disabled: oklch(
+    0.65 0.005 240
+  ); /* Accessible disabled state */
+
+  /* Surface Colors */
+  --color-surface-primary: oklch(1 0 0); /* Pure white */
+  --color-surface-secondary: oklch(0.98 0.005 240); /* Very light */
+  --color-surface-tertiary: oklch(0.96 0.005 240); /* Light elevated */
+  --color-surface-interactive: oklch(0.94 0.005 240); /* Hover backgrounds */
+  --color-surface-overlay: oklch(1 0 0 / 0.95); /* Light overlays */
+
+  /* Interactive Colors */
+  --color-interactive-secondary: oklch(0.95 0.005 240);
+  --color-interactive-secondary-hover: oklch(0.92 0.005 240);
+  --color-interactive-disabled: oklch(0.85 0.005 240);
+
+  /* Border Colors */
+  --color-border-primary: oklch(0.91 0.005 240);
+  --color-border-secondary: oklch(0.94 0.005 240);
+  --color-border-subtle: oklch(0.94 0.005 240);
+
+  /* Professional Glass Morphism for Light Mode */
+  --glass-bg-semantic: oklch(1 0 0 / 0.85);
+  --glass-bg-strong-semantic: oklch(1 0 0 / 0.95);
+  --glass-border-subtle-semantic: oklch(0.91 0.005 240 / 0.6);
+
+  /* Professional Light Mode Shadows */
+  --shadow-elevation-1: 0 2px 8px oklch(0.25 0.02 240 / 0.08);
+  --shadow-elevation-2: 0 4px 16px oklch(0.25 0.02 240 / 0.1);
+  --shadow-elevation-3: 0 8px 24px oklch(0.25 0.02 240 / 0.12);
+  --shadow-elevation-4: 0 16px 40px oklch(0.25 0.02 240 / 0.15);
+
+  /* Alert Colors - Light Mode */
+  --color-alert-success-bg: oklch(0.97 0.02 158); /* เขียวอ่อนมาก ทึบ */
+  --color-alert-success-border: oklch(0.52 0.15 158 / 0.4);
+  --color-alert-success-text: oklch(0.25 0.12 158); /* เข้มขึ้นเพื่อ Contrast */
+  --color-alert-success-icon: oklch(0.4 0.15 158);
+
+  --color-alert-warning-bg: oklch(0.97 0.03 85); /* เหลือง/ส้มอ่อนมาก ทึบ */
+  --color-alert-warning-border: oklch(0.65 0.18 85 / 0.4);
+  --color-alert-warning-text: oklch(0.3 0.15 85);
+  --color-alert-warning-icon: oklch(0.45 0.18 85);
+
+  --color-alert-error-bg: oklch(0.97 0.02 25); /* แดงอ่อนมาก ทึบ */
+  --color-alert-error-border: oklch(0.6 0.22 25 / 0.4);
+  --color-alert-error-text: oklch(0.3 0.18 25);
+  --color-alert-error-icon: oklch(0.45 0.22 25);
+
+  --color-alert-info-bg: oklch(0.97 0.02 250); /* ฟ้าอ่อนมาก ทึบ */
+  --color-alert-info-border: oklch(0.6 0.18 250 / 0.4);
+  --color-alert-info-text: oklch(0.25 0.15 250);
+  --color-alert-info-icon: oklch(0.4 0.18 250);
+}
+
+/* ===== SEMANTIC UTILITIES ===== */
+
+@utility glass-semantic {
+  background: var(--glass-bg-semantic);
+  backdrop-filter: blur(var(--backdrop-blur-glass)) saturate(180%);
+  border: 1px solid var(--glass-border-subtle-semantic);
+  box-shadow: var(--shadow-elevation-2);
+}
+
+@utility glass-strong-semantic {
+  background: var(--glass-bg-strong-semantic);
+  backdrop-filter: blur(var(--backdrop-blur-strong)) saturate(180%);
+  border: 1px solid var(--color-border-glass);
+  box-shadow: var(--shadow-elevation-4);
+}
+
+@utility gradient-brand-semantic {
+  background: var(--gradient-brand-semantic);
+}
+
+@utility gradient-text-semantic {
+  background: var(--gradient-brand-semantic);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility shadow-glow-semantic {
+  box-shadow: var(--shadow-glow-semantic);
+}
+
+/* ===== BASE LAYER OVERRIDES ===== */
+
+@layer base {
+  * {
+    @apply border-border;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+      Arial, sans-serif;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Modern scrollbar - Pure Gray for Dark Mode */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: oklch(0.18 0 0);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-interactive-primary);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-interactive-primary-hover);
+  }
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* ===== TIPTAP EDITOR STYLES ===== */
+.tiptap-editor {
+  @apply min-h-[200px];
+}
+
+.tiptap-editor .ProseMirror {
+  @apply focus:outline-none;
+}
+
+/* Tiptap Placeholder */
+.tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
+  color: var(--color-muted-foreground);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* ===== PROSE STYLING ===== */
+.prose {
+  @apply text-foreground;
+}
+
+.prose h1 {
+  @apply text-2xl font-bold mb-4 mt-6;
+}
+
+.prose h2 {
+  @apply text-xl font-bold mb-3 mt-5;
+}
+
+.prose h3 {
+  @apply text-lg font-bold mb-2 mt-4;
+}
+
+.prose p {
+  @apply mb-3;
+}
+
+.prose ul,
+.prose ol {
+  @apply mb-3 pl-6;
+}
+
+.prose ul {
+  @apply list-disc;
+}
+
+.prose ol {
+  @apply list-decimal;
+}
+
+.prose li {
+  @apply mb-1;
+}
+
+.prose strong {
+  @apply font-bold;
+}
+
+.prose em {
+  @apply italic;
+}
+
+.prose code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm;
+}
+
+.prose pre {
+  @apply bg-muted p-4 rounded-lg overflow-x-auto;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary pl-4 italic my-4;
+}
+
+.prose hr {
+  @apply border-border my-6;
+}
+
+.prose a {
+  @apply text-primary underline hover:text-primary/80;
+}
+
+/* Dark mode prose adjustments */
+.dark .prose code {
+  @apply bg-muted/50;
+}
+
+.dark .prose pre {
+  @apply bg-muted/50;
+}
