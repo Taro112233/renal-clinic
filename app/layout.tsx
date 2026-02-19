@@ -14,8 +14,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "NextJS Starter",
-  description: "template for nextjs apps",
+  title: "renal clinic",
+  description: "renal clinic management system",
 };
 
 export default function RootLayout({
