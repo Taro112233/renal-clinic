@@ -1,6 +1,6 @@
 // This file is auto-generated. Do not edit manually.
 // Edit files in prisma/schemas/ directory instead.
-// Last generated: 2026-02-21T08:06:10.565Z
+// Last generated: 2026-02-21T18:04:58.482Z
 // HealthTech Sandbox
 
 generator client {
@@ -14,6 +14,105 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+
+// ==========================================
+// BASE SCHEMA - V1.0
+// ==========================================
+
+// prisma/schemas/base.prisma
+// ========================================
+// Base Enums และ Types พื้นฐาน
+// ========================================
+
+enum Gender {
+  M
+  F
+}
+
+enum CaseType {
+  NEW
+  OLD
+}
+
+enum PatientStatus {
+  ACTIVE
+  DISCHARGED
+  REFERRED
+  DECEASED
+}
+
+enum HealthScheme {
+  UC                  // บัตรทอง
+  SSS                 // ประกันสังคม
+  CSMBS               // ขรก./ท้องถิ่น
+  OTHER               // อื่นๆ
+}
+
+enum RheuDiagnosis {
+  RA                    // Rheumatoid Arthritis
+  SLE                   // Systemic Lupus Erythematosus
+  SSC                   // Systemic Sclerosis (Scleroderma)
+  UCTD                  // Undifferentiated Connective Tissue Disease
+  GOUT                  // Gout
+  PSORA                 // Psoriatic Arthritis
+  SPA                   // Spondyloarthritis
+  OVERLAP_SYNDROME      // Overlap Syndrome
+  DERMATOMYOSITIS       // Dermatomyositis
+  BEHCETS_DISEASE       // Behcet's Disease
+  POLYMYALGIA_RHEUMATICA // Polymyalgia Rheumatica
+  OTHER                 // อื่นๆ
+}
+
+enum CounselingType {
+  PRE
+  POST
+}
+
+enum AdrStatus {
+  NO
+  YES_DMARD               // Yes จาก DMARD
+  YES_HQ                  // Yes จาก HQ
+  YES_OTHER               // Yes จากยาอื่นๆ
+  YES_DMARD_HQ            // Yes จาก DMARDs + HQ
+  YES_DMARD_OTHER         // Yes จาก DMARDs + ยาอื่นๆ
+}
+
+enum EyeAppointmentStatus {
+  YES                     // มีนัด Eye
+  NO                      // ยังไม่มีนัด
+  LOSS                    // loss นัด EYE
+  EXTERNAL_SCREENING      // screen ที่รพ.อื่น/คลินิกอื่น
+}
+
+enum ConsultEyeResult {
+  YES                     // OK consult แล้ว
+  NO                      // ไม่
+  NOT_SUGGESTED           // ไม่ได้ suggest นัด
+}
+
+enum PopupHQAction {
+  SET_NEW                 // set new pop
+  UPDATE                  // update pop-up
+  EXISTING                // มี pop-up เดิม
+  NONE                    // no
+}
+
+enum ComplianceStatus {
+  COMPLIANT               // กินถูก+ครบ
+  NON_COMPLIANT           // non-compliance
+}
+
+enum NonComplianceType {
+  WRONG_METHOD          // ผิดวิธี/จำผิด
+  FORGOT_DOSE           // ลืมกินยา
+  SELF_ADJUST           // ปรับ/หยุดยาเอง
+  LOSS_FOLLOWUP         // Loss f/u, ขาดยา
+}
+
+enum CyclophosphamideRoute {
+  ORAL
+  IV
+}
 
 // ==========================================
 // BETTER-AUTH SCHEMA - ADDITIONAL
@@ -44,6 +143,9 @@ model User {
   // Better Auth relations
   sessions      Session[]
   accounts      Account[]
+  
+  // ✅ RheuPharmCare relations
+  counselingRecords CounselingRecord[] @relation("PharmacistCounselingRecords")
   
   @@index([email])
   @@index([role])
@@ -104,4 +206,248 @@ enum UserRole {
   USER
   ADMIN
   SUPERADMIN
+}
+
+// ==========================================
+// COUNSELING SCHEMA - ADDITIONAL
+// ==========================================
+
+// prisma/schemas/counseling.prisma
+// ========================================
+// Counseling Records & Related Items
+// ========================================
+
+model CounselingRecord {
+  id              String    @id @default(cuid())
+  
+  // === ข้อมูลพื้นฐาน ===
+  date            DateTime                      // วันที่ทำ C/L (DD/MM/YYYY)
+  sequenceNumber  Int?                          // ลำดับในวันนั้น
+  patientId       String
+  patient         Patient   @relation(fields: [patientId], references: [id])
+  pharmacistId    String                        // userId ของเภสัชกรที่ทำ
+  pharmacist      User      @relation("PharmacistCounselingRecords", fields: [pharmacistId], references: [id])
+  counselingType  CounselingType                // PRE or POST
+  
+  // === ข้อมูลยา ===
+  currentDmards   String?                       // ยา DMARDs ที่ใช้อยู่ (text, เช่น "MTX, HCQ, Pred")
+  hasDmards       Boolean   @default(false)     // มี DMARDs หรือไม่
+  otherMeds       String?                       // ยาอื่นๆ
+  
+  // === ซักประวัติ ===
+  historyNote     String?                       // Note จากการซักประวัติ (free text)
+  
+  // === ADR (Adverse Drug Reaction) ===
+  adrStatus       AdrStatus @default(NO)        // No, Yes จาก DMARD, Yes จาก HQ, Yes จากยาอื่นๆ, Yes จาก DMARDs+HQ, Yes จาก DMARDs+ยาอื่นๆ
+  adrDescription  String?                       // รายละเอียด ADR
+  
+  // === HQ/CQ Eye Screening (เฉพาะคนที่ใช้ HQ/CQ) ===
+  hasHQ              Boolean  @default(false)   // คนไข้มีใช้ยา HQ/CQ?
+  eyeScreeningStatus String?                    // ซัก Eye → ตาปกติ, มีปัญหา, ไม่ได้ซัก
+  eyeAppointmentStatus EyeAppointmentStatus?    // Yes, No, loss นัด EYE, screen ที่รพ.อื่น/คลินิกอื่น
+  consultEyeResult   ConsultEyeResult?          // [if No/loss] Yes = OK consult, No, ไม่ได้ suggest นัด
+  prevEyeDate        DateTime?                  // prev. EYE date
+  eyeResult          String?                    // EYEล่าสุด: no maculopathy, maculopathy, etc.
+  nextEyeDate        DateTime?                  // next EYE date
+  popupHQAction      PopupHQAction?             // set new pop, update pop, มี pop-up เดิม, no
+  
+  // === Compliance / Adherence ===
+  complianceStatus   ComplianceStatus            // กินถูก+ครบ, non-compliance
+  nonComplianceItems NonComplianceItem[]         // รายละเอียดปัญหา (1-3 รายการ)
+  
+  // === ยาเหลือ (Leftover medications) ===
+  leftoverMeds    String?                       // Text: "ssz=100, losec=30, naproxen=30"
+  
+  // === Health Behavior ===
+  alcoholStatus   String?                       // No, Yes เบียร์, Yes เหล้า/40, Yes เบียร์+เหล้า, Yes ตามเทศกาล
+  herbStatus      String?                       // No, อาหารเสริม, นม/อาหารทางการแพทย์
+  smokingStatus   String?                       // No, Yes บุหรี่, Yes ยาเส้น
+  nsaidFromOther  String?                       // NSAID จากที่อื่น (free text)
+  
+  // === DRP (Drug Related Problem) / Consult ===
+  hasDrp          Boolean  @default(false)      // พบ DRP?
+  drpItems        DrpItem[]                     // รายละเอียด DRP (1-2 รายการ)
+  
+  // === Contraception ===
+  contraceptionMethod String?                   // วิธีคุมกำเนิด
+  
+  // === Medication Error ===
+  hasME           Boolean  @default(false)      // พบ ME?
+  meDescription   String?                       // รายละเอียด ME
+  meLevel         String?                       // Level: A-G (NCC MERP)
+  
+  // === Lab Values (เจาะแลป) ===
+  labDate         DateTime?                     // วันที่เจาะแลป
+  wbc             Float?                        // WBC (5000-10000 cells/mm3)
+  absoluteNeutrophil Float?                     // Absolute Neutrophil Count
+  neutrophilPercent  Float?                     // Neutrophil %
+  ast             Float?                        // AST (0-31 U/L)
+  alt             Float?                        // ALT (0-34 U/L)
+  alp             Float?                        // ALP (40-150 U/L)
+  uricAcid        Float?                        // Uric acid (3.6-8.2 mg/dL)
+  creatinine      Float?                        // Creatinine (0.55-1.02 mg/dL)
+  albumin         Float?                        // Albumin (3.5-5.2 gm/dL)
+  hsCRP           Float?                        // hsCRP (<1 mg/L)
+  labLevel        String?                       // ระดับปกติ/ผิดปกติ
+  
+  // === Cyclophosphamide (ถ้ามี) ===
+  hasCyclophosphamide Boolean @default(false)
+  cyclophosphamideRoute CyclophosphamideRoute?  // ORAL or IV
+  cyclophosphamideCumulativeDose Float?         // Cumulative dose (mg)
+  
+  // === Other Notes ===
+  note            String?                       // Note อื่นๆ
+  
+  // === Meta ===
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([date])
+  @@index([patientId])
+  @@index([pharmacistId])
+  @@index([date, pharmacistId])
+  @@index([counselingType])
+  @@map("counseling_records")
+}
+
+model NonComplianceItem {
+  id                String   @id @default(cuid())
+  counselingRecordId String
+  counselingRecord   CounselingRecord @relation(fields: [counselingRecordId], references: [id], onDelete: Cascade)
+  
+  orderNumber       Int                          // 1, 2, or 3
+  type              NonComplianceType             // ประเภทปัญหา
+  description       String?                       // รายละเอียด/ยาที่เกี่ยวข้อง
+  
+  @@index([counselingRecordId])
+  @@map("non_compliance_items")
+}
+
+model DrpItem {
+  id                String   @id @default(cuid())
+  counselingRecordId String
+  counselingRecord   CounselingRecord @relation(fields: [counselingRecordId], references: [id], onDelete: Cascade)
+  
+  orderNumber       Int                          // 1 or 2
+  drugName          String                       // ชื่อยาที่เกี่ยวข้อง
+  drpType           String                       // ประเภท DRP (free text หรือ enum ตามต้องการ)
+  consultResult     String?                      // ผล consult: accept, not accept, pending
+  
+  @@index([counselingRecordId])
+  @@map("drp_items")
+}
+
+// ==========================================
+// DRUG SCHEMA - ADDITIONAL
+// ==========================================
+
+// prisma/schemas/drug.prisma
+// ========================================
+// Drug Management & Cost Saving
+// ========================================
+
+model DrugMaster {
+  id          String   @id @default(cuid())
+  drugCode    String   @unique                  // รหัสยา
+  drugName    String                            // ชื่อยา
+  unitPrice   Float                             // ราคาต่อหน่วย
+  isDmard     Boolean  @default(false)          // เป็น DMARD?
+  isHQ        Boolean  @default(false)          // เป็น HQ/CQ?
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([drugCode])
+  @@index([isDmard])
+  @@index([isHQ])
+  @@map("drug_masters")
+}
+
+model DrugSavingRecord {
+  id          String   @id @default(cuid())
+  month       Int                               // เดือน (1-12)
+  year        Int                               // ปี คศ. (2025, 2026, ...)
+  fiscalYear  String                            // ปีงบประมาณ เช่น "68", "69"
+  
+  drugCode    String                            // รหัสยา เช่น "1M013B"
+  drugName    String                            // ชื่อยา เช่น "MTX 2.5 mg tab"
+  unitPrice   Float                             // ราคาต่อเม็ด/หน่วย (บาท)
+  quantity    Int                               // จำนวนเม็ด/หน่วยที่ซักหักยาเหลือได้
+  totalSaving Float                             // = unitPrice × quantity
+  
+  isDmard     Boolean  @default(false)          // เป็นยากลุ่ม DMARDs?
+  
+  createdBy   String                            // userId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([month, year, drugCode])
+  @@index([fiscalYear])
+  @@index([month, year])
+  @@index([isDmard])
+  @@map("drug_saving_records")
+}
+
+// ==========================================
+// PATIENT SCHEMA - ADDITIONAL
+// ==========================================
+
+// prisma/schemas/patient.prisma
+// ========================================
+// Patient Registry & Diagnosis
+// ========================================
+
+model Patient {
+  id            String    @id @default(cuid())
+  hn            String    @unique              // Hospital Number — PK จากระบบ HIS
+  prefix        String?                         // คำนำหน้า: นาย, นาง, นางสาว, เด็กชาย, เด็กหญิง
+  firstName     String
+  lastName      String
+  gender        Gender                          // M, F
+  dateOfBirth   DateTime?
+  
+  // Clinical status
+  caseType      CaseType  @default(NEW)         // NEW = New case, OLD = Old case (Follow-up)
+  status        PatientStatus @default(ACTIVE)   // ACTIVE, DISCHARGED, REFERRED, DECEASED
+  
+  // ข้อมูลสิทธิ์
+  healthScheme  HealthScheme                    // UC, ปกส., ขรก./ท้องถิ่น, อื่นๆ
+  
+  // Diagnosis — ผู้ป่วย 1 คน อาจมีมากกว่า 1 Dx
+  diagnoses     PatientDiagnosis[]
+  
+  // Clinic info
+  newClinicDate DateTime?                       // วันที่มาคลินิกครั้งแรก
+  referDate     DateTime?                       // วันที่ refer/discharge
+  referNote     String?
+  
+  // Relations
+  counselingRecords CounselingRecord[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     String                          // userId ของคนสร้าง
+  
+  @@index([hn])
+  @@index([lastName, firstName])
+  @@index([status])
+  @@index([caseType])
+  @@map("patients")
+}
+
+model PatientDiagnosis {
+  id          String   @id @default(cuid())
+  patientId   String
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  diagnosis   RheuDiagnosis
+  isPrimary   Boolean  @default(false)
+  diagnosedAt DateTime?
+  note        String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([patientId])
+  @@index([diagnosis])
+  @@map("patient_diagnoses")
 }

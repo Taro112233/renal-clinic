@@ -1,0 +1,94 @@
+// prisma/schemas/base.prisma
+// ========================================
+// Base Enums และ Types พื้นฐาน
+// ========================================
+
+enum Gender {
+  M
+  F
+}
+
+enum CaseType {
+  NEW
+  OLD
+}
+
+enum PatientStatus {
+  ACTIVE
+  DISCHARGED
+  REFERRED
+  DECEASED
+}
+
+enum HealthScheme {
+  UC                  // บัตรทอง
+  SSS                 // ประกันสังคม
+  CSMBS               // ขรก./ท้องถิ่น
+  OTHER               // อื่นๆ
+}
+
+enum RheuDiagnosis {
+  RA                    // Rheumatoid Arthritis
+  SLE                   // Systemic Lupus Erythematosus
+  SSC                   // Systemic Sclerosis (Scleroderma)
+  UCTD                  // Undifferentiated Connective Tissue Disease
+  GOUT                  // Gout
+  PSORA                 // Psoriatic Arthritis
+  SPA                   // Spondyloarthritis
+  OVERLAP_SYNDROME      // Overlap Syndrome
+  DERMATOMYOSITIS       // Dermatomyositis
+  BEHCETS_DISEASE       // Behcet's Disease
+  POLYMYALGIA_RHEUMATICA // Polymyalgia Rheumatica
+  OTHER                 // อื่นๆ
+}
+
+enum CounselingType {
+  PRE
+  POST
+}
+
+enum AdrStatus {
+  NO
+  YES_DMARD               // Yes จาก DMARD
+  YES_HQ                  // Yes จาก HQ
+  YES_OTHER               // Yes จากยาอื่นๆ
+  YES_DMARD_HQ            // Yes จาก DMARDs + HQ
+  YES_DMARD_OTHER         // Yes จาก DMARDs + ยาอื่นๆ
+}
+
+enum EyeAppointmentStatus {
+  YES                     // มีนัด Eye
+  NO                      // ยังไม่มีนัด
+  LOSS                    // loss นัด EYE
+  EXTERNAL_SCREENING      // screen ที่รพ.อื่น/คลินิกอื่น
+}
+
+enum ConsultEyeResult {
+  YES                     // OK consult แล้ว
+  NO                      // ไม่
+  NOT_SUGGESTED           // ไม่ได้ suggest นัด
+}
+
+enum PopupHQAction {
+  SET_NEW                 // set new pop
+  UPDATE                  // update pop-up
+  EXISTING                // มี pop-up เดิม
+  NONE                    // no
+}
+
+enum ComplianceStatus {
+  COMPLIANT               // กินถูก+ครบ
+  NON_COMPLIANT           // non-compliance
+}
+
+enum NonComplianceType {
+  WRONG_METHOD          // ผิดวิธี/จำผิด
+  FORGOT_DOSE           // ลืมกินยา
+  SELF_ADJUST           // ปรับ/หยุดยาเอง
+  LOSS_FOLLOWUP         // Loss f/u, ขาดยา
+}
+
+enum CyclophosphamideRoute {
+  ORAL
+  IV
+}

@@ -1,0 +1,47 @@
+// prisma/schemas/drug.prisma
+// ========================================
+// Drug Management & Cost Saving
+// ========================================
+
+model DrugMaster {
+  id          String   @id @default(cuid())
+  drugCode    String   @unique                  // รหัสยา
+  drugName    String                            // ชื่อยา
+  unitPrice   Float                             // ราคาต่อหน่วย
+  isDmard     Boolean  @default(false)          // เป็น DMARD?
+  isHQ        Boolean  @default(false)          // เป็น HQ/CQ?
+  isActive    Boolean  @default(true)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([drugCode])
+  @@index([isDmard])
+  @@index([isHQ])
+  @@map("drug_masters")
+}
+
+model DrugSavingRecord {
+  id          String   @id @default(cuid())
+  month       Int                               // เดือน (1-12)
+  year        Int                               // ปี คศ. (2025, 2026, ...)
+  fiscalYear  String                            // ปีงบประมาณ เช่น "68", "69"
+  
+  drugCode    String                            // รหัสยา เช่น "1M013B"
+  drugName    String                            // ชื่อยา เช่น "MTX 2.5 mg tab"
+  unitPrice   Float                             // ราคาต่อเม็ด/หน่วย (บาท)
+  quantity    Int                               // จำนวนเม็ด/หน่วยที่ซักหักยาเหลือได้
+  totalSaving Float                             // = unitPrice × quantity
+  
+  isDmard     Boolean  @default(false)          // เป็นยากลุ่ม DMARDs?
+  
+  createdBy   String                            // userId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([month, year, drugCode])
+  @@index([fiscalYear])
+  @@index([month, year])
+  @@index([isDmard])
+  @@map("drug_saving_records")
+}

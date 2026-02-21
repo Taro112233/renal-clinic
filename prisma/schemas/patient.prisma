@@ -1,0 +1,58 @@
+// prisma/schemas/patient.prisma
+// ========================================
+// Patient Registry & Diagnosis
+// ========================================
+
+model Patient {
+  id            String    @id @default(cuid())
+  hn            String    @unique              // Hospital Number — PK จากระบบ HIS
+  prefix        String?                         // คำนำหน้า: นาย, นาง, นางสาว, เด็กชาย, เด็กหญิง
+  firstName     String
+  lastName      String
+  gender        Gender                          // M, F
+  dateOfBirth   DateTime?
+  
+  // Clinical status
+  caseType      CaseType  @default(NEW)         // NEW = New case, OLD = Old case (Follow-up)
+  status        PatientStatus @default(ACTIVE)   // ACTIVE, DISCHARGED, REFERRED, DECEASED
+  
+  // ข้อมูลสิทธิ์
+  healthScheme  HealthScheme                    // UC, ปกส., ขรก./ท้องถิ่น, อื่นๆ
+  
+  // Diagnosis — ผู้ป่วย 1 คน อาจมีมากกว่า 1 Dx
+  diagnoses     PatientDiagnosis[]
+  
+  // Clinic info
+  newClinicDate DateTime?                       // วันที่มาคลินิกครั้งแรก
+  referDate     DateTime?                       // วันที่ refer/discharge
+  referNote     String?
+  
+  // Relations
+  counselingRecords CounselingRecord[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  createdBy     String                          // userId ของคนสร้าง
+  
+  @@index([hn])
+  @@index([lastName, firstName])
+  @@index([status])
+  @@index([caseType])
+  @@map("patients")
+}
+
+model PatientDiagnosis {
+  id          String   @id @default(cuid())
+  patientId   String
+  patient     Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  diagnosis   RheuDiagnosis
+  isPrimary   Boolean  @default(false)
+  diagnosedAt DateTime?
+  note        String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([patientId])
+  @@index([diagnosis])
+  @@map("patient_diagnoses")
+}
