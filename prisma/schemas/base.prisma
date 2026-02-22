@@ -1,7 +1,4 @@
 // prisma/schemas/base.prisma
-// ========================================
-// Base Enums และ Types พื้นฐาน
-// ========================================
 
 enum Gender {
   M
@@ -21,25 +18,25 @@ enum PatientStatus {
 }
 
 enum HealthScheme {
-  UC                  // บัตรทอง
-  SSS                 // ประกันสังคม
-  CSMBS               // ขรก./ท้องถิ่น
-  OTHER               // อื่นๆ
+  UC
+  SSS
+  CSMBS
+  OTHER
 }
 
 enum RheuDiagnosis {
-  RA                    // Rheumatoid Arthritis
-  SLE                   // Systemic Lupus Erythematosus
-  SSC                   // Systemic Sclerosis (Scleroderma)
-  UCTD                  // Undifferentiated Connective Tissue Disease
-  GOUT                  // Gout
-  PSORA                 // Psoriatic Arthritis
-  SPA                   // Spondyloarthritis
-  OVERLAP_SYNDROME      // Overlap Syndrome
-  DERMATOMYOSITIS       // Dermatomyositis
-  BEHCETS_DISEASE       // Behcet's Disease
-  POLYMYALGIA_RHEUMATICA // Polymyalgia Rheumatica
-  OTHER                 // อื่นๆ
+  RA
+  SLE
+  SSC
+  UCTD
+  GOUT
+  PSORA
+  SPA
+  OVERLAP_SYNDROME
+  DERMATOMYOSITIS
+  BEHCETS_DISEASE
+  POLYMYALGIA_RHEUMATICA
+  OTHER
 }
 
 enum CounselingType {
@@ -49,46 +46,71 @@ enum CounselingType {
 
 enum AdrStatus {
   NO
-  YES_DMARD               // Yes จาก DMARD
-  YES_HQ                  // Yes จาก HQ
-  YES_OTHER               // Yes จากยาอื่นๆ
-  YES_DMARD_HQ            // Yes จาก DMARDs + HQ
-  YES_DMARD_OTHER         // Yes จาก DMARDs + ยาอื่นๆ
+  YES_DMARD
+  YES_HQ
+  YES_OTHER
+  YES_DMARD_HQ
+  YES_DMARD_OTHER
 }
 
 enum EyeAppointmentStatus {
-  YES                     // มีนัด Eye
-  NO                      // ยังไม่มีนัด
-  LOSS                    // loss นัด EYE
-  EXTERNAL_SCREENING      // screen ที่รพ.อื่น/คลินิกอื่น
+  YES
+  NO
+  LOSS
+  EXTERNAL_SCREENING
 }
 
 enum ConsultEyeResult {
-  YES                     // OK consult แล้ว
-  NO                      // ไม่
-  NOT_SUGGESTED           // ไม่ได้ suggest นัด
+  YES
+  NO
+  NOT_SUGGESTED
 }
 
 enum PopupHQAction {
-  SET_NEW                 // set new pop
-  UPDATE                  // update pop-up
-  EXISTING                // มี pop-up เดิม
-  NONE                    // no
+  SET_NEW
+  UPDATE
+  EXISTING
+  NONE
 }
 
 enum ComplianceStatus {
-  COMPLIANT               // กินถูก+ครบ
-  NON_COMPLIANT           // non-compliance
+  COMPLIANT
+  NON_COMPLIANT
+  UNABLE_TO_ASSESS  // ✅ เพิ่ม: ประเมินไม่ได้
 }
 
 enum NonComplianceType {
-  WRONG_METHOD          // ผิดวิธี/จำผิด
-  FORGOT_DOSE           // ลืมกินยา
-  SELF_ADJUST           // ปรับ/หยุดยาเอง
-  LOSS_FOLLOWUP         // Loss f/u, ขาดยา
+  WRONG_METHOD
+  FORGOT_DOSE
+  SELF_ADJUST
+  LOSS_FOLLOWUP
+  STOPPED_DUE_TO_ADR  // ✅ เพิ่ม: หยุดยาจาก ADR
 }
 
 enum CyclophosphamideRoute {
   ORAL
   IV
+}
+
+// ✅ ตารางกลางสำหรับ dropdown options ทั้งหมด
+// category examples:
+//   prefix, dmard, eye_screening_status, eye_result,
+//   popup_hq, alcohol, herb, smoking, drp_type,
+//   me_type, contraception
+model SelectOption {
+  id          String   @id @default(cuid())
+  category    String                        // กลุ่มของ dropdown เช่น "alcohol", "drp_type"
+  value       String                        // ค่าที่เก็บใน DB เช่น "YES_BEER"
+  label       String                        // label แสดงผล เช่น "Yes เบียร์"
+  sortOrder   Int      @default(0)          // ลำดับการแสดงผล
+  isActive    Boolean  @default(true)
+  metadata    Json?                         // ข้อมูลเพิ่มเติม เช่น { "color": "warning" }
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([category, value])
+  @@index([category])
+  @@index([category, isActive])
+  @@map("select_options")
 }
