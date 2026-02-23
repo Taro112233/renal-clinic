@@ -1,9 +1,9 @@
 Directory structure:
-└── taro112233-nextjs-starter-2026/
+└── taro112233-renal-clinic/
     ├── README.md
     ├── components.json
     ├── eslint.config.mjs
-    ├── INSTRUCTIONS.md
+    ├── INSTRUCTION.md
     ├── middleware.ts
     ├── next.config.ts
     ├── package.json
@@ -17,16 +17,42 @@ Directory structure:
     │   ├── layout.tsx
     │   ├── not-found.tsx
     │   ├── page.tsx
+    │   ├── admin/
+    │   │   └── page.tsx
     │   ├── api/
+    │   │   ├── admin/
+    │   │   │   └── users/
+    │   │   │       ├── route.ts
+    │   │   │       └── [id]/
+    │   │   │           └── role/
+    │   │   │               └── route.ts
     │   │   ├── arcjet/
     │   │   │   └── route.ts
     │   │   ├── auth/
     │   │   │   └── [...all]/
     │   │   │       └── route.ts
-    │   │   └── profile/
-    │   │       ├── route.ts
-    │   │       └── avatar/
-    │   │           └── route.ts
+    │   │   ├── counseling/
+    │   │   │   ├── route.ts
+    │   │   │   └── [id]/
+    │   │   │       └── route.ts
+    │   │   ├── patients/
+    │   │   │   ├── route.ts
+    │   │   │   └── lookup/
+    │   │   │       └── route.ts
+    │   │   ├── profile/
+    │   │   │   ├── route.ts
+    │   │   │   └── avatar/
+    │   │   │       └── route.ts
+    │   │   └── settings/
+    │   │       └── select-options/
+    │   │           ├── route.ts
+    │   │           └── [id]/
+    │   │               └── route.ts
+    │   ├── counseling/
+    │   │   └── new/
+    │   │       └── page.tsx
+    │   ├── dashboard/
+    │   │   └── page.tsx
     │   ├── login/
     │   │   └── page.tsx
     │   ├── privacy-policy/
@@ -35,12 +61,50 @@ Directory structure:
     │   │   └── page.tsx
     │   ├── register/
     │   │   └── page.tsx
+    │   ├── settings/
+    │   │   └── page.tsx
+    │   ├── showcase/
+    │   │   └── page.tsx
     │   └── terms-of-service/
     │       └── page.tsx
     ├── components/
     │   ├── AuthGuard.tsx
+    │   ├── AdminPage/
+    │   │   ├── AdminSkeleton.tsx
+    │   │   ├── index.tsx
+    │   │   ├── PaginationBar.tsx
+    │   │   ├── RoleSelector.tsx
+    │   │   ├── UserCardList.tsx
+    │   │   └── UserTable.tsx
     │   ├── CookieConsent/
     │   │   └── index.tsx
+    │   ├── CounselingForm/
+    │   │   ├── index.tsx
+    │   │   ├── Section01_BasicInfo.tsx
+    │   │   ├── Section02_Medications.tsx
+    │   │   ├── Section03_History.tsx
+    │   │   ├── Section04_ADR.tsx
+    │   │   ├── Section05_EyeScreening.tsx
+    │   │   ├── Section06_Compliance.tsx
+    │   │   ├── Section07_LeftoverMeds.tsx
+    │   │   ├── Section08_HealthBehavior.tsx
+    │   │   ├── Section09_DRP.tsx
+    │   │   ├── Section10_Other.tsx
+    │   │   ├── Section11_LabValues.tsx
+    │   │   ├── Section12_Cyclophosphamide.tsx
+    │   │   └── SectionNote.tsx
+    │   ├── Dashboard/
+    │   │   ├── DashboardActions.tsx
+    │   │   ├── DashboardContent.tsx
+    │   │   ├── DashboardHeader.tsx
+    │   │   ├── DashboardSkeleton.tsx
+    │   │   ├── DashboardStats.tsx
+    │   │   └── index.tsx
+    │   ├── PendingApproval/
+    │   │   ├── index.tsx
+    │   │   ├── PendingApprovalContent.tsx
+    │   │   ├── PendingApprovalHeader.tsx
+    │   │   └── PendingApprovalSkeleton.tsx
     │   ├── ProfilePage/
     │   │   ├── AccountSection.tsx
     │   │   ├── index.tsx
@@ -54,6 +118,9 @@ Directory structure:
     │   │   ├── MenuBar.tsx
     │   │   ├── RichTextEditor.tsx
     │   │   └── RichTextViewer.tsx
+    │   ├── SettingsPage/
+    │   │   ├── index.tsx
+    │   │   └── SelectOptionsManager.tsx
     │   ├── shared/
     │   │   ├── AppHeader.tsx
     │   │   ├── EmptyState.tsx
@@ -121,8 +188,11 @@ Directory structure:
     ├── hooks/
     │   ├── use-mobile.ts
     │   ├── use-theme-transition.ts
+    │   ├── useAdminUsers.ts
+    │   ├── useCounselingForm.ts
     │   ├── useCurrentUser.ts
     │   ├── useProfile.ts
+    │   ├── useSelectOptions.ts
     │   └── useTheme.ts
     ├── lib/
     │   ├── arcjet-config.ts
@@ -140,11 +210,19 @@ Directory structure:
     │   └── utils.ts
     ├── prisma/
     │   ├── schema.prisma
-    │   └── schemas/
-    │       └── better-auth.prisma
+    │   ├── seed.ts
+    │   ├── schemas/
+    │   │   ├── base.prisma
+    │   │   ├── better-auth.prisma
+    │   │   ├── counseling.prisma
+    │   │   ├── drug.prisma
+    │   │   └── patient.prisma
+    │   └── seeds/
+    │       └── select-options.seed.ts
     ├── scripts/
     │   ├── merge-schemas.js
     │   └── merge-seeds.js
     └── types/
         ├── cookie.d.ts
+        ├── counseling.ts
         └── profile.ts
