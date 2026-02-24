@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/dialog';
@@ -358,7 +357,7 @@ export function SelectOptionsManager() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Tag className="w-4 h-4" />
-              เพิ่มตัวเลือกใน "{CATEGORY_LABELS[addDialog.category] ?? addDialog.category}"
+              เพิ่มตัวเลือกใน &ldquo;{CATEGORY_LABELS[addDialog.category] ?? addDialog.category}&rdquo;
             </DialogTitle>
             <DialogDescription>
               category: <code className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">{addDialog.category}</code>
@@ -476,7 +475,7 @@ export function SelectOptionsManager() {
           <AlertDialogHeader>
             <AlertDialogTitle>ยืนยันการลบตัวเลือก</AlertDialogTitle>
             <AlertDialogDescription>
-              คุณต้องการลบ <strong>"{deleteConfirm?.label}"</strong>{' '}
+              คุณต้องการลบ <strong>&ldquo;{deleteConfirm?.label}&rdquo;</strong>{' '}
               (<code className="font-mono text-xs">{deleteConfirm?.value}</code>) ออกจากระบบหรือไม่?
               การลบนี้ไม่สามารถกู้คืนได้ และอาจกระทบข้อมูลที่มีอยู่
             </AlertDialogDescription>

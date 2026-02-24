@@ -28,15 +28,10 @@ import { SectionNote } from './SectionNote';
 
 import type {
   CounselingFormValues,
-  CounselingType,
-  AdrStatus,
   EyeAppointmentStatus,
   ConsultEyeResult,
   PopupHQAction,
-  ComplianceStatus,
   NonComplianceItemForm,
-  DrpItemForm,
-  LeftoverMedItem,
   CyclophosphamideRoute,
   CreateCounselingRequest,
 } from '@/types/counseling';
@@ -163,7 +158,7 @@ function toPayload(values: CounselingFormValues): CreateCounselingRequest {
 export function CounselingForm() {
   const router = useRouter();
   const { user } = useCurrentUser();
-  const { data: optionsData, loading: optionsLoading } = useSelectOptions();
+  const { data: optionsData } = useSelectOptions();
   const {
     patient, patientLoading, patientRecords,
     lookupPatient, clearPatient,

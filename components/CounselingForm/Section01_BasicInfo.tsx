@@ -1,7 +1,7 @@
 // components/CounselingForm/Section01_BasicInfo.tsx
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Search, User, UserPlus, AlertCircle,
+  Search, UserPlus, AlertCircle,
   CheckCircle2, Loader2, X,
 } from 'lucide-react';
 import type {
@@ -103,7 +103,7 @@ interface Props {
 
 // ─── Component ────────────────────────────────────
 export function Section01_BasicInfo({
-  date, patientId, counselingType,
+  date, counselingType,
   onDateChange, onCounselingTypeChange,
   patient, patientLoading, patientRecords,
   onLookup, onClear, onCreatePatient, creatingPatient,
@@ -125,6 +125,7 @@ export function Section01_BasicInfo({
       setNewPatientErrors({});
       setSelectedRecord('');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patient?.id]);
 
   // ─── Search ───────────────────────────────────

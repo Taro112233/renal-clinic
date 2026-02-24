@@ -4,6 +4,11 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
+interface SessionUser {
+  id: string;
+  role?: string;
+}
+
 const CreatePatientSchema = z.object({
   hn: z.string().min(1, 'กรุณากรอก HN'),
   prefix: z.string().optional(),
@@ -30,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const role = (session.user as any).role;
+    const { role } = session.user as SessionUser;
     if (role === 'USER') {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
@@ -46,7 +51,6 @@ export async function POST(request: NextRequest) {
 
     const d = parsed.data;
 
-    // Check duplicate HN
     const existing = await prisma.patient.findUnique({ where: { hn: d.hn } });
     if (existing) {
       return NextResponse.json(

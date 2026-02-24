@@ -2,21 +2,11 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { 
-  Stethoscope, 
-  Lock, 
-  Palette, 
-  Database, 
-  Zap,
-  Github,
-  ArrowRight,
-  CheckCircle2,
   Code2,
   Sparkles,
   Trash2
@@ -26,29 +16,6 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 export default function LandingPage() {
   const router = useRouter();
   const { user } = useCurrentUser();
-
-  const features = [
-    {
-      icon: <Lock className="w-8 h-8 text-blue-500" />,
-      title: 'Authentication Ready',
-      description: 'Better Auth with Google OAuth & Credentials login pre-configured'
-    },
-    {
-      icon: <Palette className="w-8 h-8 text-purple-500" />,
-      title: 'Multi-Theme System',
-      description: '4 beautiful themes with light/dark mode support'
-    },
-    {
-      icon: <Database className="w-8 h-8 text-green-500" />,
-      title: 'Database Setup',
-      description: 'Prisma + PostgreSQL (Neon) ready to use'
-    },
-    {
-      icon: <Zap className="w-8 h-8 text-yellow-500" />,
-      title: 'Modern Stack',
-      description: 'Next.js 15, TypeScript, Tailwind CSS v4, Shadcn/UI'
-    }
-  ];
 
   const techStack = [
     'Next.js 15',

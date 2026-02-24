@@ -22,7 +22,6 @@ export function AdminPage() {
     pagination,
     loading,
     error,
-    fetchParams,
     setFetchParams,
     updateUserRole,
     isUpdating,

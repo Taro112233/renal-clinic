@@ -4,6 +4,11 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
+interface SessionUser {
+  id: string;
+  role?: string;
+}
+
 const NonComplianceItemSchema = z.object({
   orderNumber: z.number().int().min(1).max(3),
   type: z.enum(['WRONG_METHOD', 'FORGOT_DOSE', 'SELF_ADJUST', 'LOSS_FOLLOWUP', 'STOPPED_DUE_TO_ADR']),
@@ -139,7 +144,6 @@ export async function POST(request: NextRequest) {
         cyclophosphamideRoute: d.cyclophosphamideRoute ?? undefined,
         cyclophosphamideCumulativeDose: d.cyclophosphamideCumulativeDose ?? undefined,
         note: d.note,
-        // Nested creates
         nonComplianceItems: d.nonComplianceItems.length > 0
           ? { create: d.nonComplianceItems }
           : undefined,
@@ -174,7 +178,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') ?? '20');
     const skip = (page - 1) * limit;
 
-    const role = (session.user as any).role;
+    const { role } = session.user as SessionUser;
     const whereClause = role === 'ADMIN'
       ? { pharmacistId: session.user.id }
       : {};

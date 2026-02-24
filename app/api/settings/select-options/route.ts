@@ -5,6 +5,15 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 
+interface SessionUser {
+  id: string;
+  role?: string;
+}
+
+interface PrismaUniqueError {
+  code: string;
+}
+
 const CreateSelectOptionSchema = z.object({
   category: z.string().min(1),
   value: z.string().min(1),
@@ -38,7 +47,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const role = (session.user as any).role;
+  const { role } = session.user as SessionUser;
   if (role !== 'SUPERADMIN' && role !== 'ADMIN') {
     return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
   }
@@ -65,8 +74,12 @@ export async function POST(request: NextRequest) {
       },
     });
     return NextResponse.json({ success: true, data: option }, { status: 201 });
-  } catch (err: any) {
-    if (err.code === 'P2002') {
+  } catch (err: unknown) {
+    if (
+      typeof err === 'object' &&
+      err !== null &&
+      (err as PrismaUniqueError).code === 'P2002'
+    ) {
       return NextResponse.json(
         { success: false, error: 'ค่า value นี้มีอยู่แล้วใน category นี้' },
         { status: 409 }

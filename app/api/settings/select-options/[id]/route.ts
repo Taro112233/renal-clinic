@@ -5,6 +5,11 @@ import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 
+interface SessionUser {
+  id: string;
+  role?: string;
+}
+
 const UpdateSelectOptionSchema = z.object({
   label: z.string().min(1).optional(),
   sortOrder: z.number().int().optional(),
@@ -14,18 +19,19 @@ const UpdateSelectOptionSchema = z.object({
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session?.user) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const role = (session.user as any).role;
+  const { role } = session.user as SessionUser;
   if (role !== 'SUPERADMIN' && role !== 'ADMIN') {
     return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
   }
 
+  const { id } = await params;
   const body = await request.json();
   const parsed = UpdateSelectOptionSchema.safeParse(body);
   if (!parsed.success) {
@@ -38,7 +44,7 @@ export async function PATCH(
   const { metadata, ...rest } = parsed.data;
 
   const updated = await prisma.selectOption.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       ...rest,
       ...(metadata !== undefined && {
@@ -54,14 +60,14 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session?.user) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
   }
 
-  const role = (session.user as any).role;
+  const { role } = session.user as SessionUser;
   if (role !== 'SUPERADMIN') {
     return NextResponse.json(
       { success: false, error: 'เฉพาะ SUPERADMIN เท่านั้น' },
@@ -69,6 +75,7 @@ export async function DELETE(
     );
   }
 
-  await prisma.selectOption.delete({ where: { id: params.id } });
+  const { id } = await params;
+  await prisma.selectOption.delete({ where: { id } });
   return NextResponse.json({ success: true });
 }
