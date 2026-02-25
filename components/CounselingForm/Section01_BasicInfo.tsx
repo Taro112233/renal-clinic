@@ -14,7 +14,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Search, UserPlus, AlertCircle,
-  CheckCircle2, Loader2, X,
+  CheckCircle2, Loader2, X, RefreshCw,
 } from 'lucide-react';
 import type {
   PatientSummary, CounselingRecordSummary,
@@ -23,7 +23,6 @@ import type {
 import type { CreatePatientPayload } from '@/hooks/useCounselingForm';
 import { cn } from '@/lib/utils';
 
-// ─── Static label maps ───────────────────────────
 const diagnosisLabels: Record<string, string> = {
   RA: 'RA', SLE: 'SLE', SSC: 'SSc', UCTD: 'UCTD', GOUT: 'Gout',
   PSORA: 'PsA', SPA: 'SpA', OVERLAP_SYNDROME: 'Overlap',
@@ -42,7 +41,6 @@ const healthSchemeLabels: Record<string, string> = {
   CSMBS: 'ข้าราชการ (CSMBS)', OTHER: 'อื่นๆ',
 };
 
-// ─── New Patient Form types ───────────────────────
 interface DiagnosisEntry {
   diagnosis: RheuDiagnosis;
   isPrimary: boolean;
@@ -62,14 +60,9 @@ interface NewPatientForm {
 type NewPatientErrors = Partial<Record<keyof NewPatientForm, string>>;
 
 const defaultNewPatient: NewPatientForm = {
-  prefix: '',
-  firstName: '',
-  lastName: '',
-  gender: '',
-  dateOfBirth: '',
-  caseType: 'NEW',
-  healthScheme: '',
-  diagnoses: [],
+  prefix: '', firstName: '', lastName: '',
+  gender: '', dateOfBirth: '', caseType: 'NEW',
+  healthScheme: '', diagnoses: [],
 };
 
 function validateNewPatient(form: NewPatientForm): NewPatientErrors {
@@ -81,7 +74,6 @@ function validateNewPatient(form: NewPatientForm): NewPatientErrors {
   return errs;
 }
 
-// ─── Props ────────────────────────────────────────
 interface Props {
   date: string;
   patientId: string;
@@ -95,40 +87,39 @@ interface Props {
   onClear: () => void;
   onCreatePatient: (payload: CreatePatientPayload) => Promise<boolean>;
   creatingPatient: boolean;
+  // รับ selectedRecordId จาก parent
+  selectedRecordId: string | null;
+  onRecordSelect: (recordId: string | null) => void;
   onLoadRecord: (recordId: string) => void;
   loadingRecord: boolean;
   errors?: Partial<Record<'date' | 'patientId' | 'counselingType', string>>;
   prefixOptions?: { value: string; label: string }[];
 }
 
-// ─── Component ────────────────────────────────────
 export function Section01_BasicInfo({
   date, counselingType,
   onDateChange, onCounselingTypeChange,
   patient, patientLoading, patientRecords,
   onLookup, onClear, onCreatePatient, creatingPatient,
+  selectedRecordId, onRecordSelect,
   onLoadRecord, loadingRecord,
   errors = {},
   prefixOptions = [],
 }: Props) {
   const [hnInput, setHnInput] = useState<string>('');
-  const [selectedRecord, setSelectedRecord] = useState<string>('');
   const [showNewForm, setShowNewForm] = useState<boolean>(false);
   const [newPatient, setNewPatient] = useState<NewPatientForm>(defaultNewPatient);
   const [newPatientErrors, setNewPatientErrors] = useState<NewPatientErrors>({});
 
-  // Reset new-patient state when patient is resolved
+  // Reset เมื่อ patient เปลี่ยน
   useEffect(() => {
     if (patient) {
       setShowNewForm(false);
       setNewPatient(defaultNewPatient);
       setNewPatientErrors({});
-      setSelectedRecord('');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patient?.id]);
 
-  // ─── Search ───────────────────────────────────
   const handleSearch = async () => {
     if (!hnInput.trim()) return;
     const result = await onLookup(hnInput.trim());
@@ -144,13 +135,18 @@ export function Section01_BasicInfo({
     if (e.key === 'Enter') { e.preventDefault(); handleSearch(); }
   };
 
-  // ─── Record selector ──────────────────────────
+  // เมื่อเลือก record
   const handleRecordChange = (val: string) => {
-    setSelectedRecord(val);
-    if (val && val !== 'new') onLoadRecord(val);
+    if (val === 'new') {
+      // เพิ่มใหม่ — ล้าง selectedRecordId, ไม่โหลดข้อมูลเก่า
+      onRecordSelect(null);
+    } else {
+      // เลือก record เก่า — set id + โหลดข้อมูลลงฟอร์ม
+      onRecordSelect(val);
+      onLoadRecord(val);
+    }
   };
 
-  // ─── New Patient helpers ──────────────────────
   const setNPField = <K extends keyof NewPatientForm>(key: K, val: NewPatientForm[K]) => {
     setNewPatient(prev => ({ ...prev, [key]: val }));
     setNewPatientErrors(prev => ({ ...prev, [key]: undefined }));
@@ -167,17 +163,13 @@ export function Section01_BasicInfo({
 
   const setPrimary = (dx: RheuDiagnosis) => {
     setNPField('diagnoses', newPatient.diagnoses.map(d => ({
-      ...d,
-      isPrimary: d.diagnosis === dx,
+      ...d, isPrimary: d.diagnosis === dx,
     })));
   };
 
   const handleCreatePatient = async () => {
     const errs = validateNewPatient(newPatient);
-    if (Object.keys(errs).length > 0) {
-      setNewPatientErrors(errs);
-      return;
-    }
+    if (Object.keys(errs).length > 0) { setNewPatientErrors(errs); return; }
     const ok = await onCreatePatient({
       hn: hnInput.trim(),
       prefix: newPatient.prefix || undefined,
@@ -199,7 +191,9 @@ export function Section01_BasicInfo({
     setNewPatientErrors({});
   };
 
-  // ─── Render ───────────────────────────────────
+  // label ของ record ที่ถูกเลือก (สำหรับแสดง badge)
+  const selectedRecord = patientRecords.find(r => r.id === selectedRecordId);
+
   return (
     <Card>
       <CardHeader>
@@ -353,22 +347,23 @@ export function Section01_BasicInfo({
               ))}
             </div>
 
-            {/* Previous record selector */}
+            {/* Previous record selector — records already sorted newest first from API */}
             {patientRecords.length > 0 && (
               <div className="space-y-1.5 pt-1 border-t border-border-subtle">
                 <Label className="text-xs text-content-secondary">
-                  โหลดข้อมูลจาก record ก่อนหน้า
+                  โหลดและบันทึกทับ record เดิม
                 </Label>
                 <Select
-                  value={selectedRecord}
+                  value={selectedRecordId ?? 'new'}
                   onValueChange={handleRecordChange}
                   disabled={loadingRecord}
                 >
                   <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="— เพิ่มใหม่ (ฟอร์มว่าง) —" />
+                    <SelectValue placeholder="— สร้างใหม่ —" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="new">— เพิ่มใหม่ (ฟอร์มว่าง) —</SelectItem>
+                    {/* ล่าสุดขึ้นก่อน (API ส่งมา desc อยู่แล้ว) */}
+                    <SelectItem value="new">— สร้าง record ใหม่ —</SelectItem>
                     {patientRecords.map((r) => (
                       <SelectItem key={r.id} value={r.id}>
                         {new Date(r.date).toLocaleDateString('th-TH', {
@@ -380,6 +375,21 @@ export function Section01_BasicInfo({
                     ))}
                   </SelectContent>
                 </Select>
+
+                {/* Badge แจ้งว่ากำลังจะทับ record ไหน */}
+                {selectedRecordId && selectedRecord && (
+                  <div className="flex items-center gap-1.5 text-xs text-alert-warning-text bg-alert-warning-bg border border-alert-warning-border rounded-md px-2.5 py-1.5">
+                    <RefreshCw className="w-3 h-3 shrink-0" />
+                    <span>
+                      บันทึกจะ <strong>ทับ</strong> record วันที่{' '}
+                      {new Date(selectedRecord.date).toLocaleDateString('th-TH', {
+                        day: '2-digit', month: 'short', year: '2-digit',
+                      })}{' '}
+                      ({selectedRecord.counselingType === 'PRE' ? 'Pre' : 'Post'}-CL)
+                    </span>
+                  </div>
+                )}
+
                 {loadingRecord && (
                   <p className="text-xs text-content-tertiary animate-pulse">กำลังโหลด record...</p>
                 )}
@@ -391,8 +401,6 @@ export function Section01_BasicInfo({
         {/* New Patient Inline Form */}
         {!patientLoading && showNewForm && !patient && (
           <div className="rounded-lg border border-alert-warning-border bg-alert-warning-bg p-4 space-y-4">
-
-            {/* Header */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-4 h-4 text-alert-warning-icon shrink-0 mt-0.5" />
@@ -416,9 +424,7 @@ export function Section01_BasicInfo({
               </Button>
             </div>
 
-            {/* Form fields */}
             <div className="space-y-3 bg-surface-primary/60 rounded-lg p-3">
-
               {/* Prefix + First + Last */}
               <div className="grid grid-cols-[100px_1fr_1fr] gap-2">
                 <div className="space-y-1.5">
@@ -578,7 +584,6 @@ export function Section01_BasicInfo({
                   })}
                 </div>
 
-                {/* Primary selector — shows only when 2+ diagnoses selected */}
                 {newPatient.diagnoses.length > 1 && (
                   <div className="flex flex-wrap gap-1.5 pt-1 items-center">
                     <span className="text-xs text-content-tertiary">Primary:</span>
@@ -602,7 +607,6 @@ export function Section01_BasicInfo({
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex justify-end gap-2 pt-1">
               <Button
                 type="button"
@@ -621,15 +625,9 @@ export function Section01_BasicInfo({
                 className="gradient-brand-semantic hover:opacity-90 gap-1.5"
               >
                 {creatingPatient ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    กำลังบันทึก...
-                  </>
+                  <><Loader2 className="w-3.5 h-3.5 animate-spin" />กำลังบันทึก...</>
                 ) : (
-                  <>
-                    <UserPlus className="w-3.5 h-3.5" />
-                    เพิ่มผู้ป่วยใหม่
-                  </>
+                  <><UserPlus className="w-3.5 h-3.5" />เพิ่มผู้ป่วยใหม่</>
                 )}
               </Button>
             </div>

@@ -10,7 +10,6 @@ import type {
   CreateCounselingRequest,
 } from '@/types/counseling';
 
-// ── Export ให้ Section01 import ได้ ──────────────
 export interface CreatePatientPayload {
   hn: string;
   prefix?: string;
@@ -27,6 +26,8 @@ export interface UseCounselingFormReturn {
   patient: PatientSummary | null;
   patientLoading: boolean;
   patientRecords: CounselingRecordSummary[];
+  selectedRecordId: string | null;
+  setSelectedRecordId: (id: string | null) => void;
   lookupPatient: (hn: string) => Promise<'found' | 'not_found'>;
   clearPatient: () => void;
   createPatient: (payload: CreatePatientPayload) => Promise<boolean>;
@@ -42,6 +43,7 @@ export function useCounselingForm(): UseCounselingFormReturn {
   const [patient, setPatient] = useState<PatientSummary | null>(null);
   const [patientLoading, setPatientLoading] = useState(false);
   const [patientRecords, setPatientRecords] = useState<CounselingRecordSummary[]>([]);
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [loadingRecord, setLoadingRecord] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [creatingPatient, setCreatingPatient] = useState(false);
@@ -57,10 +59,12 @@ export function useCounselingForm(): UseCounselingFormReturn {
       if (json.success && json.data) {
         setPatient(json.data.patient);
         setPatientRecords(json.data.records ?? []);
+        setSelectedRecordId(null);
         return 'found';
       }
       setPatient(null);
       setPatientRecords([]);
+      setSelectedRecordId(null);
       return 'not_found';
     } catch {
       toast.error('เกิดข้อผิดพลาดในการค้นหาผู้ป่วย');
@@ -73,6 +77,7 @@ export function useCounselingForm(): UseCounselingFormReturn {
   const clearPatient = useCallback(() => {
     setPatient(null);
     setPatientRecords([]);
+    setSelectedRecordId(null);
   }, []);
 
   const createPatient = useCallback(async (payload: CreatePatientPayload): Promise<boolean> => {
@@ -85,9 +90,7 @@ export function useCounselingForm(): UseCounselingFormReturn {
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || 'สร้างผู้ป่วยไม่สำเร็จ');
-      }
+      if (!res.ok || !json.success) throw new Error(json.error || 'สร้างผู้ป่วยไม่สำเร็จ');
       setPatient({
         id: json.data.id,
         hn: json.data.hn,
@@ -102,6 +105,7 @@ export function useCounselingForm(): UseCounselingFormReturn {
         diagnoses: json.data.diagnoses ?? [],
       });
       setPatientRecords([]);
+      setSelectedRecordId(null);
       toast.success(`เพิ่มผู้ป่วย HN ${json.data.hn} สำเร็จ`);
       return true;
     } catch (err) {
@@ -131,17 +135,22 @@ export function useCounselingForm(): UseCounselingFormReturn {
   const submitCounseling = useCallback(async (data: CreateCounselingRequest): Promise<boolean> => {
     try {
       setSubmitting(true);
-      const res = await fetch('/api/counseling', {
-        method: 'POST',
+
+      const isUpdate = !!selectedRecordId;
+      const url = isUpdate ? `/api/counseling/${selectedRecordId}` : '/api/counseling';
+      const method = isUpdate ? 'PATCH' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(data),
       });
+
       const json = await res.json();
-      if (!res.ok || !json.success) {
-        throw new Error(json.error || 'บันทึกไม่สำเร็จ');
-      }
-      toast.success('บันทึก Counseling สำเร็จ');
+      if (!res.ok || !json.success) throw new Error(json.error || 'บันทึกไม่สำเร็จ');
+
+      toast.success(isUpdate ? 'อัปเดต Counseling สำเร็จ' : 'บันทึก Counseling สำเร็จ');
       router.push('/counseling');
       return true;
     } catch (err) {
@@ -150,12 +159,14 @@ export function useCounselingForm(): UseCounselingFormReturn {
     } finally {
       setSubmitting(false);
     }
-  }, [router]);
+  }, [router, selectedRecordId]);
 
   return {
     patient,
     patientLoading,
     patientRecords,
+    selectedRecordId,
+    setSelectedRecordId,
     lookupPatient,
     clearPatient,
     createPatient,
