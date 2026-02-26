@@ -3,9 +3,8 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, X, RotateCcw } from 'lucide-react';
+import { Loader2, Save, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useSelectOptions } from '@/hooks/useSelectOptions';
@@ -143,7 +142,6 @@ function toPayload(values: CounselingFormValues): CreateCounselingRequest {
 }
 
 export function CounselingForm() {
-  const router = useRouter();
   const { user } = useCurrentUser();
   const { data: optionsData } = useSelectOptions();
   const {

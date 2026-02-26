@@ -118,7 +118,7 @@ export function Section01_BasicInfo({
       setNewPatient(defaultNewPatient);
       setNewPatientErrors({});
     }
-  }, [patient?.id]);
+  }, [patient]);
 
   const handleSearch = async () => {
     if (!hnInput.trim()) return;

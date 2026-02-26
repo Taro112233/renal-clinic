@@ -194,7 +194,7 @@ export function Section08_HealthBehavior({
 
         <div className="flex items-center gap-2 text-xs text-content-tertiary">
           <Heart className="w-3.5 h-3.5" />
-          <span>เลือกได้หลายรายการ — เลือก "ไม่มี" เพื่อล้างทั้งหมด</span>
+          <span>เลือกได้หลายรายการ — เลือก &ldquo;ไม่มี&rdquo; เพื่อล้างทั้งหมด</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
