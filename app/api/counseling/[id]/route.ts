@@ -49,9 +49,10 @@ const UpdateCounselingSchema = z.object({
   complianceStatus: z.enum(['COMPLIANT', 'NON_COMPLIANT', 'UNABLE_TO_ASSESS']),
   nonComplianceItems: z.array(NonComplianceItemSchema).max(3).default([]),
   leftoverMeds: z.array(LeftoverMedSchema).optional(),
-  alcoholStatus: z.string().optional(),
-  herbStatus: z.string().optional(),
-  smokingStatus: z.string().optional(),
+  // ✅ เปลี่ยนเป็น array
+  alcoholStatus: z.array(z.string()).default([]),
+  herbStatus: z.array(z.string()).default([]),
+  smokingStatus: z.array(z.string()).default([]),
   nsaidFromOther: z.string().optional(),
   hasDrp: z.boolean().default(false),
   drpItems: z.array(DrpItemSchema).max(2).default([]),
@@ -130,7 +131,7 @@ export async function PATCH(
     }
 
     const { id } = await params;
-    const { role } = session.user as SessionUser;
+    const sessionUser = session.user as SessionUser;
 
     const existing = await prisma.counselingRecord.findUnique({
       where: { id },
@@ -141,7 +142,7 @@ export async function PATCH(
       return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 });
     }
 
-    if (role !== 'SUPERADMIN' && existing.pharmacistId !== session.user.id) {
+    if (sessionUser.role !== 'SUPERADMIN' && existing.pharmacistId !== session.user.id) {
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
@@ -156,7 +157,6 @@ export async function PATCH(
 
     const d = parsed.data;
 
-    // Delete nested records first, then recreate
     await prisma.$transaction([
       prisma.nonComplianceItem.deleteMany({ where: { counselingRecordId: id } }),
       prisma.drpItem.deleteMany({ where: { counselingRecordId: id } }),
@@ -184,9 +184,10 @@ export async function PATCH(
         popupHQAction: d.popupHQAction ?? undefined,
         complianceStatus: d.complianceStatus,
         leftoverMeds: d.leftoverMeds ?? undefined,
-        alcoholStatus: d.alcoholStatus ?? null,
-        herbStatus: d.herbStatus ?? null,
-        smokingStatus: d.smokingStatus ?? null,
+        // ✅ array fields
+        alcoholStatus: d.alcoholStatus,
+        herbStatus: d.herbStatus,
+        smokingStatus: d.smokingStatus,
         nsaidFromOther: d.nsaidFromOther ?? null,
         hasDrp: d.hasDrp,
         contraceptionMethod: d.contraceptionMethod ?? null,

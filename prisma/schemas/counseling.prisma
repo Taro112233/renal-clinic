@@ -50,9 +50,9 @@ model CounselingRecord {
 
   // === Health Behavior ===
   // แต่ละ field เก็บ SelectOption.value จาก category ที่ตรงกัน
-  alcoholStatus  String?  // category: "alcohol"
-  herbStatus     String?  // category: "herb"
-  smokingStatus  String?  // category: "smoking"
+  alcoholStatus  String[]       @default([])
+  herbStatus     String[]       @default([])
+  smokingStatus  String[]       @default([])
   nsaidFromOther String?  // free text
 
   // === DRP ===

@@ -121,9 +121,18 @@ export function useCounselingForm(): UseCounselingFormReturn {
       setLoadingRecord(true);
       const res = await fetch(`/api/counseling/${recordId}`, { credentials: 'include' });
       const json = await res.json();
-      if (json.success) return json.data;
-      toast.error('ไม่สามารถโหลด record ก่อนหน้าได้');
-      return null;
+      if (!json.success) {
+        toast.error('ไม่สามารถโหลด record ก่อนหน้าได้');
+        return null;
+      }
+      const r = json.data;
+      // ✅ Map array fields — fallback [] ถ้า API ส่ง null/undefined มา
+      return {
+        ...r,
+        alcoholStatus: r.alcoholStatus ?? [],
+        herbStatus: r.herbStatus ?? [],
+        smokingStatus: r.smokingStatus ?? [],
+      } as CreateCounselingRequest;
     } catch {
       toast.error('เกิดข้อผิดพลาด');
       return null;
@@ -135,7 +144,6 @@ export function useCounselingForm(): UseCounselingFormReturn {
   const submitCounseling = useCallback(async (data: CreateCounselingRequest): Promise<boolean> => {
     try {
       setSubmitting(true);
-
       const isUpdate = !!selectedRecordId;
       const url = isUpdate ? `/api/counseling/${selectedRecordId}` : '/api/counseling';
       const method = isUpdate ? 'PATCH' : 'POST';

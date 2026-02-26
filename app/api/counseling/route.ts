@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { normalizeRole } from '@/lib/auth-helpers';
 
 interface SessionUser {
   id: string;
@@ -49,9 +50,10 @@ const CreateCounselingSchema = z.object({
   complianceStatus: z.enum(['COMPLIANT', 'NON_COMPLIANT', 'UNABLE_TO_ASSESS']),
   nonComplianceItems: z.array(NonComplianceItemSchema).max(3).default([]),
   leftoverMeds: z.array(LeftoverMedSchema).optional(),
-  alcoholStatus: z.string().optional(),
-  herbStatus: z.string().optional(),
-  smokingStatus: z.string().optional(),
+  // ✅ เปลี่ยนเป็น array
+  alcoholStatus: z.array(z.string()).default([]),
+  herbStatus: z.array(z.string()).default([]),
+  smokingStatus: z.array(z.string()).default([]),
   nsaidFromOther: z.string().optional(),
   hasDrp: z.boolean().default(false),
   drpItems: z.array(DrpItemSchema).max(2).default([]),
@@ -77,6 +79,56 @@ const CreateCounselingSchema = z.object({
   cyclophosphamideCumulativeDose: z.number().optional().nullable(),
   note: z.string().optional(),
 });
+
+export async function GET(request: NextRequest) {
+  try {
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') ?? '1');
+    const limit = parseInt(searchParams.get('limit') ?? '20');
+    const skip = (page - 1) * limit;
+
+    const sessionUser = session.user as SessionUser;
+    const role = normalizeRole(sessionUser.role);
+    const isAdminLevel = role === 'ADMIN' || role === 'SUPERADMIN';
+
+    const where = isAdminLevel ? {} : { pharmacistId: session.user.id };
+
+    const [records, total] = await Promise.all([
+      prisma.counselingRecord.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { date: 'desc' },
+        include: {
+          patient: { select: { hn: true, firstName: true, lastName: true } },
+          pharmacist: { select: { name: true } },
+          nonComplianceItems: true,
+          drpItems: true,
+        },
+      }),
+      prisma.counselingRecord.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        records,
+        pagination: {
+          page, limit, total,
+          totalPages: Math.ceil(total / limit),
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Get counseling records error:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -104,46 +156,47 @@ export async function POST(request: NextRequest) {
         counselingType: d.counselingType,
         hasDmards: d.hasDmards,
         currentDmards: d.currentDmards,
-        otherMeds: d.otherMeds,
-        historyNote: d.historyNote,
+        otherMeds: d.otherMeds ?? null,
+        historyNote: d.historyNote ?? null,
         adrStatus: d.adrStatus,
-        adrDescription: d.adrDescription,
+        adrDescription: d.adrDescription ?? null,
         hasHQ: d.hasHQ,
-        eyeScreeningStatus: d.eyeScreeningStatus,
+        eyeScreeningStatus: d.eyeScreeningStatus ?? null,
         eyeAppointmentStatus: d.eyeAppointmentStatus ?? undefined,
         consultEyeResult: d.consultEyeResult ?? undefined,
-        prevEyeDate: d.prevEyeDate ? new Date(d.prevEyeDate) : undefined,
-        eyeResult: d.eyeResult,
-        nextEyeDate: d.nextEyeDate ? new Date(d.nextEyeDate) : undefined,
+        prevEyeDate: d.prevEyeDate ? new Date(d.prevEyeDate) : null,
+        eyeResult: d.eyeResult ?? null,
+        nextEyeDate: d.nextEyeDate ? new Date(d.nextEyeDate) : null,
         popupHQAction: d.popupHQAction ?? undefined,
         complianceStatus: d.complianceStatus,
-        leftoverMeds: d.leftoverMeds ? d.leftoverMeds : undefined,
+        leftoverMeds: d.leftoverMeds ?? undefined,
+        // ✅ array fields
         alcoholStatus: d.alcoholStatus,
         herbStatus: d.herbStatus,
         smokingStatus: d.smokingStatus,
-        nsaidFromOther: d.nsaidFromOther,
+        nsaidFromOther: d.nsaidFromOther ?? null,
         hasDrp: d.hasDrp,
-        contraceptionMethod: d.contraceptionMethod,
+        contraceptionMethod: d.contraceptionMethod ?? null,
         hasME: d.hasME,
-        meType: d.meType,
-        meDescription: d.meDescription,
-        meLevel: d.meLevel,
-        labDate: d.labDate ? new Date(d.labDate) : undefined,
-        wbc: d.wbc ?? undefined,
-        absoluteNeutrophil: d.absoluteNeutrophil ?? undefined,
-        neutrophilPercent: d.neutrophilPercent ?? undefined,
-        ast: d.ast ?? undefined,
-        alt: d.alt ?? undefined,
-        alp: d.alp ?? undefined,
-        uricAcid: d.uricAcid ?? undefined,
-        creatinine: d.creatinine ?? undefined,
-        albumin: d.albumin ?? undefined,
-        hsCRP: d.hsCRP ?? undefined,
-        labLevel: d.labLevel,
+        meType: d.meType ?? null,
+        meDescription: d.meDescription ?? null,
+        meLevel: d.meLevel ?? null,
+        labDate: d.labDate ? new Date(d.labDate) : null,
+        wbc: d.wbc ?? null,
+        absoluteNeutrophil: d.absoluteNeutrophil ?? null,
+        neutrophilPercent: d.neutrophilPercent ?? null,
+        ast: d.ast ?? null,
+        alt: d.alt ?? null,
+        alp: d.alp ?? null,
+        uricAcid: d.uricAcid ?? null,
+        creatinine: d.creatinine ?? null,
+        albumin: d.albumin ?? null,
+        hsCRP: d.hsCRP ?? null,
+        labLevel: d.labLevel ?? null,
         hasCyclophosphamide: d.hasCyclophosphamide,
         cyclophosphamideRoute: d.cyclophosphamideRoute ?? undefined,
-        cyclophosphamideCumulativeDose: d.cyclophosphamideCumulativeDose ?? undefined,
-        note: d.note,
+        cyclophosphamideCumulativeDose: d.cyclophosphamideCumulativeDose ?? null,
+        note: d.note ?? null,
         nonComplianceItems: d.nonComplianceItems.length > 0
           ? { create: d.nonComplianceItems }
           : undefined,
@@ -159,53 +212,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    console.log(`✅ Counseling record created: ${record.id} by ${session.user.id}`);
     return NextResponse.json({ success: true, data: record }, { status: 201 });
   } catch (error) {
     console.error('Create counseling error:', error);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const session = await auth.api.getSession({ headers: request.headers });
-    if (!session?.user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') ?? '1');
-    const limit = parseInt(searchParams.get('limit') ?? '20');
-    const skip = (page - 1) * limit;
-
-    const { role } = session.user as SessionUser;
-    const whereClause = role === 'ADMIN'
-      ? { pharmacistId: session.user.id }
-      : {};
-
-    const [records, total] = await Promise.all([
-      prisma.counselingRecord.findMany({
-        where: whereClause,
-        skip,
-        take: limit,
-        orderBy: { date: 'desc' },
-        include: {
-          patient: { select: { hn: true, firstName: true, lastName: true, prefix: true } },
-          pharmacist: { select: { name: true } },
-        },
-      }),
-      prisma.counselingRecord.count({ where: whereClause }),
-    ]);
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        records,
-        pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-      },
-    });
-  } catch (error) {
-    console.error('Get counseling list error:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }
