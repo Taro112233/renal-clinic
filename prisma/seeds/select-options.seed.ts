@@ -23,7 +23,6 @@ export async function seedSelectOptions(prisma: PrismaClient) {
     // ──────────────────────────────────────
     // dmard
     // ──────────────────────────────────────
-    { category: 'dmard', value: 'NONE', label: 'ไม่มียา DMARD', sortOrder: 0 },
     { category: 'dmard', value: 'MTX', label: 'MTX', sortOrder: 1 },
     { category: 'dmard', value: 'SSZ', label: 'SSZ', sortOrder: 2 },
     { category: 'dmard', value: 'AZA', label: 'Aza', sortOrder: 3 },
@@ -62,7 +61,6 @@ export async function seedSelectOptions(prisma: PrismaClient) {
     // ──────────────────────────────────────
     // alcohol
     // ──────────────────────────────────────
-    { category: 'alcohol', value: 'NO', label: 'No', sortOrder: 1 },
     { category: 'alcohol', value: 'YES_BEER', label: 'Yes เบียร์', sortOrder: 2 },
     { category: 'alcohol', value: 'YES_LIQUOR', label: 'Yes เหล้า/40', sortOrder: 3 },
     { category: 'alcohol', value: 'YES_BEER_LIQUOR', label: 'Yes เบียร์+เหล้า', sortOrder: 4 },
@@ -72,7 +70,6 @@ export async function seedSelectOptions(prisma: PrismaClient) {
     // ──────────────────────────────────────
     // herb
     // ──────────────────────────────────────
-    { category: 'herb', value: 'NO', label: 'No', sortOrder: 1 },
     { category: 'herb', value: 'HERB_ROOT', label: 'สมุนไพร รากไม้/แดกอก', sortOrder: 2 },
     { category: 'herb', value: 'HERB_PRODUCT', label: 'สมุนไพรสำเร็จรูป', sortOrder: 3 },
     { category: 'herb', value: 'SUPPLEMENT', label: 'อาหารเสริม', sortOrder: 4 },
@@ -85,7 +82,6 @@ export async function seedSelectOptions(prisma: PrismaClient) {
     // ──────────────────────────────────────
     // smoking
     // ──────────────────────────────────────
-    { category: 'smoking', value: 'NO', label: 'No', sortOrder: 1 },
     { category: 'smoking', value: 'YES_CIGARETTE', label: 'Yes บุหรี่', sortOrder: 2 },
     { category: 'smoking', value: 'YES_ROLLING', label: 'Yes ยาเส้น', sortOrder: 3 },
     { category: 'smoking', value: 'YES_ECIG', label: 'Yes บุหรี่ไฟฟ้า', sortOrder: 4 },
