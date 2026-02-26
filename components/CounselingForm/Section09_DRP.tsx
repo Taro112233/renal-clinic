@@ -34,6 +34,15 @@ export function Section09_DRP({
   onHasDrpChange, onDrpItemsChange,
   drpTypeOptions,
 }: Props) {
+
+  const handleToggle = (v: boolean) => {
+    onHasDrpChange(v);
+    if (!v) {
+      // ปิด → ล้างรายการ DRP ทั้งหมด
+      onDrpItemsChange([]);
+    }
+  };
+
   const addItem = () => {
     if (drpItems.length >= 2) return;
     onDrpItemsChange([
@@ -72,7 +81,7 @@ export function Section09_DRP({
             <Stethoscope className="w-4 h-4 text-content-secondary" />
             <Label htmlFor="hasDrp" className="cursor-pointer">พบ DRP / ส่ง Consult</Label>
           </div>
-          <Switch id="hasDrp" checked={hasDrp} onCheckedChange={onHasDrpChange} />
+          <Switch id="hasDrp" checked={hasDrp} onCheckedChange={handleToggle} />
         </div>
 
         {hasDrp && (

@@ -66,6 +66,21 @@ export function Section05_EyeScreening({
   onNextEyeDateChange, onPopupHQActionChange,
   eyeScreeningStatusOptions, eyeResultOptions,
 }: Props) {
+
+  const handleToggle = (v: boolean) => {
+    onHasHQChange(v);
+    if (!v) {
+      // ปิด → ล้างทุก eye field
+      onEyeScreeningStatusChange('');
+      onEyeAppointmentStatusChange('');
+      onConsultEyeResultChange('');
+      onPrevEyeDateChange('');
+      onEyeResultChange('');
+      onNextEyeDateChange('');
+      onPopupHQActionChange('');
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -83,14 +98,13 @@ export function Section05_EyeScreening({
             <Eye className="w-4 h-4 text-content-secondary" />
             <Label htmlFor="hasHQ" className="cursor-pointer">ผู้ป่วยได้รับ HQ/CQ</Label>
           </div>
-          <Switch id="hasHQ" checked={hasHQ} onCheckedChange={onHasHQChange} />
+          <Switch id="hasHQ" checked={hasHQ} onCheckedChange={handleToggle} />
         </div>
 
         {hasHQ && (
           <div className="space-y-4 pl-1 border-l-2 border-border-interactive">
             <div className="pl-3 space-y-4">
 
-              {/* Eye Screening Status */}
               {eyeScreeningStatusOptions.length > 0 && (
                 <div className="space-y-2">
                   <Label>สถานะการตรวจตา</Label>
@@ -108,7 +122,6 @@ export function Section05_EyeScreening({
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Eye Appointment Status */}
                 <div className="space-y-2">
                   <Label>สถานะนัด Eye</Label>
                   <Select
@@ -124,7 +137,6 @@ export function Section05_EyeScreening({
                   </Select>
                 </div>
 
-                {/* Consult Eye Result */}
                 <div className="space-y-2">
                   <Label>ผลการ Consult จักษุ</Label>
                   <Select
@@ -142,7 +154,6 @@ export function Section05_EyeScreening({
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Prev Eye Date */}
                 <div className="space-y-2">
                   <Label htmlFor="prevEyeDate">วันที่ตรวจตาครั้งล่าสุด</Label>
                   <Input
@@ -153,7 +164,6 @@ export function Section05_EyeScreening({
                   />
                 </div>
 
-                {/* Next Eye Date */}
                 <div className="space-y-2">
                   <Label htmlFor="nextEyeDate">วันนัดตรวจตาครั้งถัดไป</Label>
                   <Input
@@ -165,7 +175,6 @@ export function Section05_EyeScreening({
                 </div>
               </div>
 
-              {/* Eye Result */}
               {eyeResultOptions.length > 0 && (
                 <div className="space-y-2">
                   <Label>ผลการตรวจตา</Label>
@@ -180,7 +189,6 @@ export function Section05_EyeScreening({
                 </div>
               )}
 
-              {/* Popup HQ Action */}
               <div className="space-y-2">
                 <Label>POP-HQ Action</Label>
                 <Select

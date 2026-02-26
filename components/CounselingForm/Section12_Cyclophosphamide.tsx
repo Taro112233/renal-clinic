@@ -26,6 +26,16 @@ export function Section12_Cyclophosphamide({
   hasCyclophosphamide, cyclophosphamideRoute, cyclophosphamideCumulativeDose,
   onHasCYCChange, onRouteChange, onCumulativeDoseChange,
 }: Props) {
+
+  const handleToggle = (v: boolean) => {
+    onHasCYCChange(v);
+    if (!v) {
+      // ปิด → ล้าง route และ dose
+      onRouteChange('');
+      onCumulativeDoseChange('');
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -43,7 +53,7 @@ export function Section12_Cyclophosphamide({
             <Syringe className="w-4 h-4 text-content-secondary" />
             <Label htmlFor="hasCYC" className="cursor-pointer">ผู้ป่วยได้รับ Cyclophosphamide</Label>
           </div>
-          <Switch id="hasCYC" checked={hasCyclophosphamide} onCheckedChange={onHasCYCChange} />
+          <Switch id="hasCYC" checked={hasCyclophosphamide} onCheckedChange={handleToggle} />
         </div>
 
         {hasCyclophosphamide && (

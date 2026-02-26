@@ -36,6 +36,17 @@ export function Section10_Other({
   onMeDescriptionChange, onMeLevelChange,
   contraceptionOptions, meTypeOptions,
 }: Props) {
+
+  const handleToggle = (v: boolean) => {
+    onHasMEChange(v);
+    if (!v) {
+      // ปิด → ล้างข้อมูล ME ทั้งหมด
+      onMeTypeChange('');
+      onMeDescriptionChange('');
+      onMeLevelChange('');
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -48,7 +59,6 @@ export function Section10_Other({
       </CardHeader>
       <CardContent className="space-y-4">
 
-        {/* Contraception */}
         {contraceptionOptions.length > 0 && (
           <div className="space-y-2">
             <Label>วิธีคุมกำเนิด</Label>
@@ -63,14 +73,13 @@ export function Section10_Other({
           </div>
         )}
 
-        {/* Medication Error */}
         <div className="space-y-3">
           <div className="flex items-center justify-between rounded-lg border border-border-primary p-3">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-content-secondary" />
               <Label htmlFor="hasME" className="cursor-pointer">พบ Medication Error (ME)</Label>
             </div>
-            <Switch id="hasME" checked={hasME} onCheckedChange={onHasMEChange} />
+            <Switch id="hasME" checked={hasME} onCheckedChange={handleToggle} />
           </div>
 
           {hasME && (

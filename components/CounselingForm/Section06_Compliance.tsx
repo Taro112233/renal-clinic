@@ -41,6 +41,15 @@ export function Section06_Compliance({
   onComplianceStatusChange, onNonComplianceItemsChange,
   error,
 }: Props) {
+
+  const handleStatusChange = (v: ComplianceStatus) => {
+    onComplianceStatusChange(v);
+    // เปลี่ยนออกจาก NON_COMPLIANT → ล้างรายการ
+    if (v !== 'NON_COMPLIANT') {
+      onNonComplianceItemsChange([]);
+    }
+  };
+
   const addItem = () => {
     if (nonComplianceItems.length >= 3) return;
     onNonComplianceItemsChange([
@@ -77,7 +86,6 @@ export function Section06_Compliance({
       </CardHeader>
       <CardContent className="space-y-4">
 
-        {/* Compliance Status */}
         <div className="space-y-2">
           <Label>สถานะการใช้ยา *</Label>
           <div className="grid grid-cols-3 gap-2">
@@ -85,7 +93,7 @@ export function Section06_Compliance({
               <button
                 key={opt.value}
                 type="button"
-                onClick={() => onComplianceStatusChange(opt.value)}
+                onClick={() => handleStatusChange(opt.value)}
                 className={cn(
                   'py-2 px-3 rounded-lg border text-sm font-medium transition-all',
                   complianceStatus === opt.value
@@ -104,7 +112,6 @@ export function Section06_Compliance({
           {error && <p className="text-sm text-alert-error-text">{error}</p>}
         </div>
 
-        {/* Non-Compliance Items */}
         {isNonCompliant && (
           <div className="space-y-3 pl-1 border-l-2 border-alert-error-border">
             <div className="pl-3 space-y-3">

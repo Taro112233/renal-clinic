@@ -34,6 +34,14 @@ export function Section02_Medications({
     }
   };
 
+  const handleToggle = (v: boolean) => {
+    onHasDmardsChange(v);
+    if (!v) {
+      // ปิด → ล้างยาที่เลือกไว้
+      onCurrentDmardsChange([]);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -46,7 +54,6 @@ export function Section02_Medications({
       </CardHeader>
       <CardContent className="space-y-4">
 
-        {/* Has DMARDs Toggle */}
         <div className="flex items-center justify-between rounded-lg border border-border-primary p-3">
           <div className="flex items-center gap-2">
             <Pill className="w-4 h-4 text-content-secondary" />
@@ -55,11 +62,10 @@ export function Section02_Medications({
           <Switch
             id="hasDmards"
             checked={hasDmards}
-            onCheckedChange={onHasDmardsChange}
+            onCheckedChange={handleToggle}
           />
         </div>
 
-        {/* DMARD Selection */}
         {hasDmards && (
           <div className="space-y-2">
             <Label>เลือก DMARDs ที่ผู้ป่วยได้รับ</Label>
@@ -100,7 +106,6 @@ export function Section02_Medications({
           </div>
         )}
 
-        {/* Other Meds */}
         <div className="space-y-2">
           <Label htmlFor="otherMeds">ยาอื่นๆ ที่ได้รับ</Label>
           <Textarea
