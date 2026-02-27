@@ -22,7 +22,6 @@ import {
   User,
   Shield,
   ChevronDown,
-  Send,
   Crown,
 } from "lucide-react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
@@ -158,10 +157,10 @@ export function AppHeader() {
             {user && (
               <>
                 {/* New Request Button */}
-                <Link href="/requests/new">
+                <Link href="/counseling/new">
                   <Button className="hidden lg:flex items-center gap-2 gradient-brand-semantic hover:opacity-90">
-                    <Send className="w-4 h-4" />
-                    ส่งคำขอใหม่
+                    <Plus className="w-4 h-4" />
+                    บันทึก C/L ใหม่
                   </Button>
                   <Button
                     size="icon"

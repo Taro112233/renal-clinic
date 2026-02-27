@@ -89,14 +89,32 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') ?? '1');
-    const limit = parseInt(searchParams.get('limit') ?? '20');
+    const limit = Math.min(parseInt(searchParams.get('limit') ?? '20'), 100);
     const skip = (page - 1) * limit;
+    const search = searchParams.get('search') ?? '';
+    const counselingType = searchParams.get('counselingType') ?? '';
 
     const sessionUser = session.user as SessionUser;
     const role = normalizeRole(sessionUser.role);
     const isAdminLevel = role === 'ADMIN' || role === 'SUPERADMIN';
 
-    const where = isAdminLevel ? {} : { pharmacistId: session.user.id };
+    const where: Parameters<typeof prisma.counselingRecord.findMany>[0]['where'] = {
+      ...(isAdminLevel ? {} : { pharmacistId: session.user.id }),
+      ...(counselingType === 'PRE' || counselingType === 'POST'
+        ? { counselingType: counselingType as 'PRE' | 'POST' }
+        : {}),
+      ...(search
+        ? {
+            patient: {
+              OR: [
+                { hn: { contains: search, mode: 'insensitive' as const } },
+                { firstName: { contains: search, mode: 'insensitive' as const } },
+                { lastName: { contains: search, mode: 'insensitive' as const } },
+              ],
+            },
+          }
+        : {}),
+    };
 
     const [records, total] = await Promise.all([
       prisma.counselingRecord.findMany({
@@ -107,8 +125,8 @@ export async function GET(request: NextRequest) {
         include: {
           patient: { select: { hn: true, firstName: true, lastName: true } },
           pharmacist: { select: { name: true } },
-          nonComplianceItems: true,
-          drpItems: true,
+          nonComplianceItems: { select: { id: true, type: true } },
+          drpItems: { select: { id: true, drugName: true } },
         },
       }),
       prisma.counselingRecord.count({ where }),
@@ -119,7 +137,9 @@ export async function GET(request: NextRequest) {
       data: {
         records,
         pagination: {
-          page, limit, total,
+          page,
+          limit,
+          total,
           totalPages: Math.ceil(total / limit),
         },
       },

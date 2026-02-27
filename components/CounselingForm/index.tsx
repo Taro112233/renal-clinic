@@ -275,7 +275,7 @@ export function CounselingForm() {
         >
           <h1 className="text-2xl font-bold text-content-primary mb-1">บันทึก Counseling</h1>
           <p className="text-content-secondary text-sm">
-            กรอกข้อมูลการให้คำปรึกษาผู้ป่วยคลินิกโรคข้อรูมาติซัม
+            กรอกข้อมูลการให้คำปรึกษาผู้ป่วยคลินิกโรคข้อรูมาตอยด์
           </p>
         </motion.div>
 
