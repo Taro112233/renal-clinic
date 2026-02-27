@@ -93,16 +93,6 @@ export function Section02_Medications({
                 })}
               </div>
             )}
-            {currentDmards.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                <span className="text-xs text-content-tertiary">เลือก:</span>
-                {currentDmards.map(d => (
-                  <Badge key={d} className="text-xs gradient-brand-semantic text-white border-transparent">
-                    {dmardOptions.find(o => o.value === d)?.label ?? d}
-                  </Badge>
-                ))}
-              </div>
-            )}
           </div>
         )}
 
