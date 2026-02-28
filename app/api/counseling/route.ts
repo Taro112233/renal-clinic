@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { normalizeRole } from '@/lib/auth-helpers';
+import { Prisma } from '@prisma/client';
 
 interface SessionUser {
   id: string;
@@ -98,7 +99,7 @@ export async function GET(request: NextRequest) {
     const role = normalizeRole(sessionUser.role);
     const isAdminLevel = role === 'ADMIN' || role === 'SUPERADMIN';
 
-    const where: Parameters<typeof prisma.counselingRecord.findMany>[0]['where'] = {
+    const where: Prisma.CounselingRecordWhereInput = {
       ...(isAdminLevel ? {} : { pharmacistId: session.user.id }),
       ...(counselingType === 'PRE' || counselingType === 'POST'
         ? { counselingType: counselingType as 'PRE' | 'POST' }
@@ -107,9 +108,9 @@ export async function GET(request: NextRequest) {
         ? {
             patient: {
               OR: [
-                { hn: { contains: search, mode: 'insensitive' as const } },
-                { firstName: { contains: search, mode: 'insensitive' as const } },
-                { lastName: { contains: search, mode: 'insensitive' as const } },
+                { hn: { contains: search, mode: 'insensitive' } },
+                { firstName: { contains: search, mode: 'insensitive' } },
+                { lastName: { contains: search, mode: 'insensitive' } },
               ],
             },
           }
