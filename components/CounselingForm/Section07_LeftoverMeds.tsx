@@ -1,17 +1,130 @@
 // components/CounselingForm/Section07_LeftoverMeds.tsx
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Package } from 'lucide-react';
+import { Plus, Trash2, Package, Search, Loader2 } from 'lucide-react';
 import type { LeftoverMedItem } from '@/types/counseling';
+
+interface DrugOption {
+  id: string;
+  drugCode: string;
+  drugName: string;
+  unitPrice: number;
+}
 
 interface Props {
   leftoverMeds: LeftoverMedItem[];
   onChange: (items: LeftoverMedItem[]) => void;
+}
+
+function DrugSearchInput({
+  value,
+  onSelect,
+}: {
+  value: string;
+  onSelect: (drugName: string) => void;
+}) {
+  const [query, setQuery] = useState(value);
+  const [results, setResults] = useState<DrugOption[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // Sync external value
+  useEffect(() => {
+    setQuery(value);
+  }, [value]);
+
+  // Click outside to close
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const search = (q: string) => {
+    setQuery(q);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!q.trim()) {
+      setResults([]);
+      setOpen(false);
+      return;
+    }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `/api/drug-master?search=${encodeURIComponent(q.trim())}&limit=10&isActive=true`,
+          { credentials: 'include' }
+        );
+        const json = await res.json();
+        if (json.success) {
+          setResults(json.data.drugs ?? []);
+          setOpen(true);
+        }
+      } catch {
+        // silent
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+  };
+
+  const handleSelect = (drug: DrugOption) => {
+    setQuery(drug.drugName);
+    setOpen(false);
+    setResults([]);
+    onSelect(drug.drugName);
+  };
+
+  return (
+    <div ref={wrapperRef} className="relative">
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-content-tertiary pointer-events-none" />
+        {loading && (
+          <Loader2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-content-tertiary animate-spin" />
+        )}
+        <Input
+          value={query}
+          onChange={(e) => search(e.target.value)}
+          onFocus={() => results.length > 0 && setOpen(true)}
+          placeholder="ค้นหายา..."
+          className="text-sm pl-8 pr-8"
+        />
+      </div>
+
+      {open && results.length > 0 && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-surface-secondary border border-border-primary rounded-lg shadow-elevation-3 max-h-52 overflow-y-auto">
+          {results.map((drug) => (
+            <button
+              key={drug.id}
+              type="button"
+              onMouseDown={() => handleSelect(drug)}
+              className="w-full text-left px-3 py-2 hover:bg-surface-interactive transition-colors"
+            >
+              <p className="text-sm text-content-primary font-medium">{drug.drugName}</p>
+              <p className="text-xs text-content-tertiary">{drug.drugCode}</p>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {open && !loading && results.length === 0 && query.trim() && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-surface-secondary border border-border-primary rounded-lg shadow-elevation-3 px-3 py-2">
+          <p className="text-sm text-content-tertiary">ไม่พบยา "{query}"</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function Section07_LeftoverMeds({ leftoverMeds, onChange }: Props) {
@@ -54,12 +167,10 @@ export function Section07_LeftoverMeds({ leftoverMeds, onChange }: Props) {
               <span />
             </div>
             {leftoverMeds.map((item, index) => (
-              <div key={index} className="grid grid-cols-[1fr_100px_32px] gap-2 items-center">
-                <Input
+              <div key={index} className="grid grid-cols-[1fr_100px_32px] gap-2 items-start">
+                <DrugSearchInput
                   value={item.drugName}
-                  onChange={(e) => updateItem(index, 'drugName', e.target.value)}
-                  placeholder="ชื่อยา"
-                  className="text-sm"
+                  onSelect={(name) => updateItem(index, 'drugName', name)}
                 />
                 <Input
                   type="number"
@@ -73,7 +184,7 @@ export function Section07_LeftoverMeds({ leftoverMeds, onChange }: Props) {
                   variant="ghost"
                   size="icon"
                   onClick={() => removeItem(index)}
-                  className="h-8 w-8 text-content-tertiary hover:text-alert-error-text"
+                  className="h-9 w-8 text-content-tertiary hover:text-alert-error-text"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>

@@ -27,7 +27,7 @@ export interface DrpItemForm {
   consultResult?: string;
 }
 
-export interface LeftoverMedForm {
+export interface LeftoverMedItem {
   drugName: string;
   quantity: number;
 }
@@ -86,7 +86,7 @@ export interface CounselingFormValues {
   complianceStatus: ComplianceStatus;
   nonComplianceItems: NonComplianceItemForm[];
 
-  leftoverMeds: LeftoverMedForm[];
+  leftoverMeds: LeftoverMedItem[];
 
   // ✅ เปลี่ยนเป็น string[] (multiselect)
   alcoholStatus: string[];
@@ -151,7 +151,7 @@ export interface CreateCounselingRequest {
   complianceStatus: ComplianceStatus;
   nonComplianceItems: NonComplianceItemForm[];
 
-  leftoverMeds?: LeftoverMedForm[];
+  leftoverMeds?: LeftoverMedItem[];
 
   // ✅ เปลี่ยนเป็น string[] (multiselect)
   alcoholStatus?: string[];
